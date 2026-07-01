@@ -21,7 +21,10 @@ export default function Features() {
   ];
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-24">
+    <section 
+    id="features"
+    className="max-w-7xl mx-auto px-6 py-24"
+    >
       <div className="text-center mb-16">
         <h2 className="text-4xl font-bold">
           Why Choose <span className="text-cyan-400">Vote Lab?</span>
