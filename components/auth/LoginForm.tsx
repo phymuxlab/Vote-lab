@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,21 +19,23 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <Card className="w-full max-w-md border-slate-800 bg-slate-900/70 backdrop-blur">
-      <CardHeader className="space-y-2 text-center">
-        <CardTitle className="text-3xl font-bold text-white">
+    <Card className="w-full max-w-xl rounded-3xl border border-slate-800 bg-slate-900/80 shadow-2xl backdrop-blur-xl">
+      <CardHeader className="space-y-3 pb-8 text-center">
+        <CardTitle className="text-4xl font-bold text-white">
           Welcome Back 👋
         </CardTitle>
 
-        <CardDescription>
-          Sign in to continue to Vote Lab
+        <CardDescription className="text-base text-slate-400">
+          Sign in to continue to your Vote Lab account.
         </CardDescription>
       </CardHeader>
 
       <CardContent>
         <form className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-white">
+              Email
+            </Label>
 
             <Input
               id="email"
@@ -43,7 +45,9 @@ export default function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-white">
+              Password
+            </Label>
 
             <div className="relative">
               <Input
@@ -66,7 +70,7 @@ export default function LoginForm() {
             </div>
           </div>
 
-          <Button className="w-full">
+          <Button className="h-12 w-full rounded-xl bg-cyan-500 font-semibold text-black hover:bg-cyan-400">
             Login
           </Button>
 
