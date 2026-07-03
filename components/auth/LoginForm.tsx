@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
-
+import GoogleButton from "@/components/auth/GoogleButton";
+import AuthDivider from "@/components/auth/AuthDivider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,6 +32,12 @@ export default function LoginForm() {
       </CardHeader>
 
       <CardContent>
+    <GoogleButton />
+
+  <AuthDivider />
+
+  
+
         <form className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-white">
@@ -41,6 +48,7 @@ export default function LoginForm() {
               id="email"
               type="email"
               placeholder="student@school.edu"
+              className=" border-slate-700 text-white placeholder:text-slate-500"
             />
           </div>
 
@@ -54,6 +62,7 @@ export default function LoginForm() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
+                className=" border-slate-700 text-white placeholder:text-slate-500"
               />
 
               <button
