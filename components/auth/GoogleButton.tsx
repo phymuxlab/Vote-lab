@@ -1,15 +1,27 @@
+"use client";
+
+import { createClient } from "@/lib/supabase/client";
 import { FcGoogle } from "react-icons/fc";
-import { Button } from "@/components/ui/button";
 
 export default function GoogleButton() {
+  const supabase = createClient();
+
+  const handleGoogleLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
+
   return (
-    <Button
-      type="button"
-      variant="outline"
-      className="h-12 w-full rounded-xl border-slate-700 bg-slate-900 text-white hover:bg-slate-800 hover:text-white"
+    <button
+      onClick={handleGoogleLogin}
+      className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-800 text-white transition hover:bg-slate-700"
     >
-      <FcGoogle className="mr-3 h-5 w-5" />
+      <FcGoogle size={22} />
       Continue with Google
-    </Button>
+    </button>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
@@ -32,6 +33,8 @@ export default function RegisterForm() {
 
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const supabase = createClient();
 
   const [errors, setErrors] = useState({
     fullName: "",
@@ -47,6 +50,7 @@ export default function RegisterForm() {
       password: "",
       confirmPassword: "",
     };
+
 
     if (!fullName.trim()) {
       newErrors.fullName = "Full name is required.";
@@ -74,20 +78,37 @@ export default function RegisterForm() {
   };
 
   const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
+  e: React.FormEvent<HTMLFormElement>
+) => {
+  e.preventDefault();
 
-    if (!validate()) return;
+  setAuthError("");
 
-    setIsLoading(true);
+  if (!validate()) return;
 
-    await new Promise((resolve) =>
-      setTimeout(resolve, 2000)
-    );
+  setIsLoading(true);
 
-    setIsLoading(false);
-  };
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+      },
+    },
+  });
+
+  setIsLoading(false);
+
+  if (error) {
+    setAuthError(error.message);
+    return;
+  }
+
+  alert(
+    "Account created successfully! Please check your email to verify your account."
+  );
+};
 
   return (
     <Card className="w-full max-w-xl rounded-3xl border border-slate-800 bg-slate-900/80 shadow-2xl backdrop-blur-xl">
@@ -233,7 +254,11 @@ export default function RegisterForm() {
             checked={acceptedTerms}
             onCheckedChange={setAcceptedTerms}
           />
-
+{authError && (
+  <p className="rounded-lg bg-red-500/10 p-3 text-sm text-red-400">
+    {authError}
+  </p>
+)}
           <Button
             type="submit"
             disabled={!acceptedTerms || isLoading}

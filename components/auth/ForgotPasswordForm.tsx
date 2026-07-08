@@ -1,5 +1,6 @@
 "use client";
 
+import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2, Mail, ArrowLeft } from "lucide-react";
@@ -16,9 +17,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function ForgotPasswordForm() {
+  const supabase = createClient();
+
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
@@ -26,11 +30,22 @@ export default function ForgotPasswordForm() {
     e.preventDefault();
 
     setLoading(true);
+    setError("");
 
-    // Temporary simulation
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo: `${window.location.origin}/reset-password`,
+      }
+    );
 
     setLoading(false);
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
     setSuccess(true);
   };
 
@@ -83,9 +98,16 @@ export default function ForgotPasswordForm() {
                 placeholder="student@school.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500"
+                required
               />
             </div>
+
+            {error && (
+              <p className="rounded-lg bg-red-500/10 p-3 text-sm text-red-400">
+                {error}
+              </p>
+            )}
 
             <Button
               type="submit"

@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
@@ -18,6 +20,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function ResetPasswordForm() {
+  const supabase = createClient();
+  const router = useRouter();
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -27,6 +32,7 @@ export default function ResetPasswordForm() {
   const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
@@ -34,6 +40,7 @@ export default function ResetPasswordForm() {
     e.preventDefault();
 
     setError("");
+    setSuccess("");
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -42,11 +49,23 @@ export default function ResetPasswordForm() {
 
     setLoading(true);
 
-    await new Promise((resolve) =>
-      setTimeout(resolve, 2000)
-    );
+    const { error } = await supabase.auth.updateUser({
+      password,
+    });
 
     setLoading(false);
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    setSuccess("Password updated successfully. Redirecting to login...");
+
+    setTimeout(() => {
+      router.push("/login");
+      router.refresh();
+    }, 2000);
   };
 
   return (
@@ -66,8 +85,6 @@ export default function ResetPasswordForm() {
           onSubmit={handleSubmit}
           className="space-y-5"
         >
-          {/* Password */}
-
           <div className="space-y-2">
             <Label
               htmlFor="password"
@@ -79,15 +96,14 @@ export default function ResetPasswordForm() {
             <div className="relative">
               <Input
                 id="password"
-                type={
-                  showPassword ? "text" : "password"
-                }
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) =>
                   setPassword(e.target.value)
                 }
                 placeholder="••••••••"
                 className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                required
               />
 
               <button
@@ -106,11 +122,8 @@ export default function ResetPasswordForm() {
             </div>
 
             <PasswordStrength password={password} />
-
             <PasswordChecklist password={password} />
           </div>
-
-          {/* Confirm */}
 
           <div className="space-y-2">
             <Label
@@ -123,17 +136,14 @@ export default function ResetPasswordForm() {
             <div className="relative">
               <Input
                 id="confirmPassword"
-                type={
-                  showConfirm ? "text" : "password"
-                }
+                type={showConfirm ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) =>
-                  setConfirmPassword(
-                    e.target.value
-                  )
+                  setConfirmPassword(e.target.value)
                 }
                 placeholder="••••••••"
                 className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                required
               />
 
               <button
@@ -153,8 +163,14 @@ export default function ResetPasswordForm() {
           </div>
 
           {error && (
-            <p className="text-sm text-red-500">
+            <p className="rounded-lg bg-red-500/10 p-3 text-sm text-red-400">
               {error}
+            </p>
+          )}
+
+          {success && (
+            <p className="rounded-lg bg-green-500/10 p-3 text-sm text-green-400">
+              {success}
             </p>
           )}
 
