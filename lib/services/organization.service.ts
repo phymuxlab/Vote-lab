@@ -27,6 +27,7 @@ export async function getOrganization(id: string) {
   if (error) throw error;
 
   return data as Organization;
+}
 
 export async function createOrganization(data: {
   owner_id: string;

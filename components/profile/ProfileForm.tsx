@@ -9,8 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-
-
 interface ProfileFormProps {
   user: User;
   profile: Profile | null;
@@ -61,7 +59,7 @@ export default function ProfileForm({
   };
 
   return (
-    <div className="mx-auto max-w-2xl rounded-3xl border border-slate-800 bg-slate-900 p-8">
+    <div className="mx-auto max-w-2xl rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
       <h1 className="mb-2 text-3xl font-bold text-white">
         Profile Settings
       </h1>
@@ -71,7 +69,7 @@ export default function ProfileForm({
       </p>
 
       <div className="space-y-6">
-        <div>
+        <div className="space-y-2">
           <Label className="text-white">
             Email
           </Label>
@@ -79,11 +77,11 @@ export default function ProfileForm({
           <Input
             value={user.email ?? ""}
             disabled
-            className="mt-2"
+            className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500"
           />
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label className="text-white">
             Full Name
           </Label>
@@ -93,11 +91,12 @@ export default function ProfileForm({
             onChange={(e) =>
               setFullName(e.target.value)
             }
-            className="mt-2"
+            placeholder="Enter your full name"
+            className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500"
           />
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label className="text-white">
             Phone Number
           </Label>
@@ -107,11 +106,12 @@ export default function ProfileForm({
             onChange={(e) =>
               setPhone(e.target.value)
             }
-            className="mt-2"
+            placeholder="+234 801 234 5678"
+            className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500"
           />
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Label className="text-white">
             Role
           </Label>
@@ -119,7 +119,7 @@ export default function ProfileForm({
           <Input
             value={profile?.role ?? "member"}
             disabled
-            className="mt-2"
+            className="border-slate-700 bg-slate-800 text-white"
           />
         </div>
 
@@ -138,7 +138,7 @@ export default function ProfileForm({
         <Button
           onClick={handleSave}
           disabled={loading}
-          className="w-full"
+          className="h-12 w-full rounded-xl bg-cyan-500 font-semibold text-black hover:bg-cyan-400"
         >
           {loading ? "Saving..." : "Save Changes"}
         </Button>

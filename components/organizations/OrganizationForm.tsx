@@ -15,7 +15,7 @@ function SubmitButton() {
     <Button
       type="submit"
       disabled={pending}
-      className="w-full"
+      className="w-full rounded-xl bg-cyan-500 font-semibold text-black hover:bg-cyan-400"
     >
       {pending
         ? "Creating Organization..."
@@ -26,7 +26,7 @@ function SubmitButton() {
 
 export default function OrganizationForm() {
   return (
-    <div className="mx-auto max-w-3xl rounded-3xl border border-slate-800 bg-slate-900 p-8">
+    <div className="mx-auto max-w-3xl rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
       <h1 className="text-3xl font-bold text-white">
         Create Organization
       </h1>
@@ -40,8 +40,11 @@ export default function OrganizationForm() {
         action={createOrganization}
         className="mt-8 space-y-6"
       >
-        <div>
-          <Label htmlFor="name">
+        <div className="space-y-2">
+          <Label
+            htmlFor="name"
+            className="text-white"
+          >
             Organization Name
           </Label>
 
@@ -50,11 +53,15 @@ export default function OrganizationForm() {
             name="name"
             placeholder="Battleground League"
             required
+            className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500"
           />
         </div>
 
-        <div>
-          <Label htmlFor="description">
+        <div className="space-y-2">
+          <Label
+            htmlFor="description"
+            className="text-white"
+          >
             Description
           </Label>
 
@@ -62,6 +69,7 @@ export default function OrganizationForm() {
             id="description"
             name="description"
             placeholder="Official eFootball community"
+            className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500"
           />
         </div>
 
