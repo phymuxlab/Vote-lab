@@ -51,9 +51,10 @@ export default async function ElectionsPage({
       ) : (
         <div className="grid gap-6">
           {elections.map((election) => (
-            <div
-              key={election.id}
-              className="rounded-2xl border border-slate-800 bg-slate-900 p-6"
+            <Link
+                key={election.id}
+                href={`/dashboard/organizations/${organizationId}/elections/${election.id}`}
+                className="block rounded-2xl border border-slate-800 bg-slate-900 p-6 transition hover:border-cyan-500 hover:bg-slate-800"
             >
               <h2 className="text-2xl font-bold text-white">
                 {election.title}
@@ -73,7 +74,7 @@ export default async function ElectionsPage({
                     election.start_date
                   ).toLocaleDateString()}
                 </span>
-              </div>
+             </Link>
             </div>
           ))}
         </div>

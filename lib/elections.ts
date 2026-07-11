@@ -17,6 +17,20 @@ export async function getElections(
   return data as Election[];
 }
 
+export async function getElection(id: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("elections")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) throw error;
+
+  return data as Election;
+}
+
 export async function createElection(data: {
   organization_id: string;
   title: string;
