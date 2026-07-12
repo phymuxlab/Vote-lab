@@ -1,7 +1,12 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
-import { getElections } from "@/lib/elections";
+import {
+  Vote,
+  Trophy,
+  Users,
+  BarChart3,
+  Settings,
+} from "lucide-react";
 
 interface PageProps {
   params: Promise<{
@@ -9,80 +14,82 @@ interface PageProps {
   }>;
 }
 
-export default async function ElectionsPage({
+export default async function OrganizationPage({
   params,
 }: PageProps) {
   const { organizationId } = await params;
 
-  const elections = await getElections(organizationId);
-  
-  console.log("Organization:", organizationId);
-console.log("Elections:", elections);
-
-
+  const cards = [
+    {
+      title: "Elections",
+      description: "Manage all elections",
+      href: `/dashboard/organizations/${organizationId}/elections`,
+      icon: Vote,
+    },
+    {
+      title: "Categories",
+      description: "Election positions",
+      href: `/dashboard/organizations/${organizationId}/categories`,
+      icon: Trophy,
+    },
+    {
+      title: "Nominees",
+      description: "Manage contestants",
+      href: `/dashboard/organizations/${organizationId}/nominees`,
+      icon: Users,
+    },
+    {
+      title: "Results",
+      description: "View live results",
+      href: `/dashboard/organizations/${organizationId}/results`,
+      icon: BarChart3,
+    },
+    {
+      title: "Settings",
+      description: "Organization settings",
+      href: `/dashboard/organizations/${organizationId}/settings`,
+      icon: Settings,
+    },
+  ];
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">
-            Elections
-          </h1>
+    <div className="space-y-10">
+      <div>
+        <h1 className="text-4xl font-bold text-white">
+          Organization Dashboard
+        </h1>
 
-          <p className="mt-2 text-slate-400">
-            Manage elections for this organization.
-          </p>
-        </div>
-
-        <Link
-          href={`/dashboard/organizations/${organizationId}/elections/create`}
-        >
-          <Button className="bg-cyan-500 text-black hover:bg-cyan-400">
-            Create Election
-          </Button>
-        </Link>
+        <p className="mt-2 text-slate-400">
+          Manage your elections, nominees, voters and results.
+        </p>
       </div>
 
-      {elections.length === 0 ? (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-10 text-center">
-          <h2 className="text-xl font-semibold text-white">
-            No Elections Yet
-          </h2>
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {cards.map((card) => {
+          const Icon = card.icon;
 
-          <p className="mt-2 text-slate-400">
-            Create your first election.
-          </p>
-        </div>
-      ) : (
-        <div className="grid gap-6">
-          {elections.map((election) => (
-            <div
-              key={election.id}
-              className="rounded-2xl border border-slate-800 bg-slate-900 p-6"
+          return (
+            <Link
+              key={card.title}
+              href={card.href}
+              className="group rounded-3xl border border-slate-800 bg-slate-900 p-8 transition hover:border-cyan-500 hover:bg-slate-800"
             >
-              <h2 className="text-2xl font-semibold text-white">
-                {election.title}
+              <Icon
+                className="mb-6 text-cyan-400 group-hover:scale-110 transition"
+                size={42}
+              />
+
+              <h2 className="text-2xl font-bold text-white">
+                {card.title}
               </h2>
 
-              <p className="mt-2 text-slate-400">
-                {election.description}
+              <p className="mt-3 text-slate-400">
+                {card.description}
               </p>
-
-              <div className="mt-6 flex items-center justify-between">
-                <span className="rounded-full bg-yellow-500/10 px-3 py-1 text-sm text-yellow-400">
-                  {election.status}
-                </span>
-
-                <span className="text-sm text-slate-500">
-                  {new Date(
-                    election.start_date
-                  ).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

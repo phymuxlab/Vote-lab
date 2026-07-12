@@ -51,32 +51,32 @@ export default async function ElectionsPage({
       ) : (
         <div className="grid gap-6">
           {elections.map((election) => (
-            <Link
-                key={election.id}
-                href={`/dashboard/organizations/${organizationId}/elections/${election.id}`}
-                className="block rounded-2xl border border-slate-800 bg-slate-900 p-6 transition hover:border-cyan-500 hover:bg-slate-800"
-            >
-              <h2 className="text-2xl font-bold text-white">
-                {election.title}
-              </h2>
+  <Link
+    key={election.id}
+    href={`/dashboard/organizations/${organizationId}/elections/${election.id}`}
+    className="block rounded-2xl border border-slate-800 bg-slate-900 p-6 transition hover:border-cyan-500 hover:bg-slate-800"
+  >
+    <h2 className="text-2xl font-bold text-white">
+      {election.title}
+    </h2>
 
-              <p className="mt-2 text-slate-400">
-                {election.description}
-              </p>
+    <p className="mt-2 text-slate-400">
+      {election.description}
+    </p>
 
-              <div className="mt-6 flex items-center justify-between">
-                <span className="rounded-full bg-yellow-500/10 px-3 py-1 text-sm text-yellow-400">
-                  {election.status}
-                </span>
+    <div className="mt-6 flex items-center justify-between">
+      <span className="rounded-full bg-yellow-500/10 px-3 py-1 text-sm text-yellow-400">
+        {election.status}
+      </span>
 
-                <span className="text-sm text-slate-500">
-                  {new Date(
-                    election.start_date
-                  ).toLocaleDateString()}
-                </span>
-             </Link>
-            </div>
-          ))}
+      <span className="text-sm text-slate-500">
+        {new Date(
+          election.start_date
+        ).toLocaleDateString()}
+      </span>
+    </div>
+  </Link>
+))}
         </div>
       )}
     </div>

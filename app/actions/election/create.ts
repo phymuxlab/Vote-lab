@@ -29,6 +29,7 @@ export async function createElectionAction(
     start_date,
     end_date,
   });
+  console.log("Organization ID:", organization_id);
 
  redirect(`/dashboard/organizations/${organization_id}/elections`);
 }

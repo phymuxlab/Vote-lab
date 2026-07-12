@@ -6,11 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Building2,
-  Vote,
-  Trophy,
-  Users,
   User,
-  Settings,
 } from "lucide-react";
 
 const links = [
@@ -25,29 +21,9 @@ const links = [
     icon: Building2,
   },
   {
-    name: "Elections",
-    href: "/dashboard/elections",
-    icon: Vote,
-  },
-  {
-    name: "Categories",
-    href: "/dashboard/categories",
-    icon: Trophy,
-  },
-  {
-    name: "Nominees",
-    href: "/dashboard/nominees",
-    icon: Users,
-  },
-  {
     name: "Profile",
     href: "/dashboard/profile",
     icon: User,
-  },
-  {
-    name: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
   },
 ];
 
@@ -71,7 +47,8 @@ export default function Sidebar() {
           const Icon = link.icon;
 
           const active =
-            pathname === link.href;
+            pathname === link.href ||
+            pathname.startsWith(link.href + "/");
 
           return (
             <Link
@@ -84,7 +61,6 @@ export default function Sidebar() {
               }`}
             >
               <Icon size={20} />
-
               {link.name}
             </Link>
           );
