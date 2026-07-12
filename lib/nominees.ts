@@ -1,48 +1,48 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Category } from "@/types/category";
+import type { Nominee } from "@/types/nominee";
 
-export async function getCategories(
-  electionId: string
+export async function getNominees(
+  categoryId: string
 ) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("election_categories")
+    .from("nominees")
     .select("*")
-    .eq("election_id", electionId)
+    .eq("category_id", categoryId)
     .order("created_at", {
       ascending: true,
     });
 
   if (error) throw error;
 
-  return data as Category[];
+  return data as Nominee[];
 }
 
-export async function getCategory(id: string) {
+export async function getNominee(id: string) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("election_categories")
+    .from("nominees")
     .select("*")
     .eq("id", id)
     .single();
 
   if (error) throw error;
 
-  return data as Category;
+  return data as Nominee;
 }
 
-export async function createCategory(data: {
-  election_id: string;
-  name: string;
-  description?: string;
-  max_votes: number;
+export async function createNominee(data: {
+  category_id: string;
+  full_name: string;
+  biography?: string;
+  image_url?: string;
 }) {
   const supabase = await createClient();
 
   const { error } = await supabase
-    .from("election_categories")
+    .from("nominees")
     .insert(data);
 
   if (error) throw error;

@@ -59,9 +59,10 @@ export default async function ElectionDetailsPage({
       ) : (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {categories.map((category) => (
-            <div
+            <Link
               key={category.id}
-              className="rounded-3xl border border-slate-800 bg-slate-900 p-6"
+              href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/${category.id}`}
+              className="block rounded-3xl border border-slate-800 bg-slate-900 p-6 transition hover:border-cyan-500 hover:bg-slate-800"
             >
               <h2 className="text-2xl font-bold text-white">
                 {category.name}
@@ -71,12 +72,16 @@ export default async function ElectionDetailsPage({
                 {category.description}
               </p>
 
-              <div className="mt-6">
+              <div className="mt-6 flex items-center justify-between">
                 <span className="rounded-full bg-cyan-500/10 px-3 py-1 text-cyan-400">
                   Max Votes: {category.max_votes}
                 </span>
+
+                <span className="text-sm text-cyan-400">
+                  View →
+                </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
