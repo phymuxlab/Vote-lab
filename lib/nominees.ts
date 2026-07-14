@@ -19,20 +19,6 @@ export async function getNominees(
   return data as Nominee[];
 }
 
-export async function getNominee(id: string) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("nominees")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (error) throw error;
-
-  return data as Nominee;
-}
-
 export async function createNominee(data: {
   category_id: string;
   full_name: string;

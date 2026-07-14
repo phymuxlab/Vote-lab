@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
+import PublishElectionButton from "@/components/elections/PublishElectionButton";
+
 import { getElection } from "@/lib/elections";
 import { getCategories } from "@/lib/categories";
 
@@ -37,13 +39,19 @@ export default async function ElectionDetailsPage({
           </p>
         </div>
 
-        <Link
-          href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/create`}
-        >
-          <Button className="bg-cyan-500 text-black hover:bg-cyan-400">
-            + Create Category
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <PublishElectionButton
+            electionId={election.id}
+          />
+
+          <Link
+            href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/create`}
+          >
+            <Button className="bg-cyan-500 text-black hover:bg-cyan-400">
+              + Create Category
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {categories.length === 0 ? (

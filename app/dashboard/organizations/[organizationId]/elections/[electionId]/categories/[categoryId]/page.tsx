@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 
@@ -65,11 +66,23 @@ export default async function CategoryPage({
           {nominees.map((nominee) => (
             <div
               key={nominee.id}
-              className="rounded-3xl border border-slate-800 bg-slate-900 p-6"
+              className="rounded-3xl border border-slate-800 bg-slate-900 p-6 transition hover:border-cyan-500 hover:bg-slate-800"
             >
-              <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-slate-800 text-3xl text-cyan-400">
-                👤
-              </div>
+              {nominee.image_url ? (
+                <div className="mb-4">
+                   <Image
+                   src={nominee.image_url}
+                   alt={nominee.full_name}
+                   width={112}
+                    height={112}
+                    className="rounded-full border-2 border-cyan-500 object-cover"
+                    />
+                  </div>
+              ) : (
+                <div className="mb-4 flex h-28 w-28 items-center justify-center rounded-full bg-slate-800 text-4xl text-cyan-400">
+                  👤
+                </div>
+              )}
 
               <h2 className="text-2xl font-bold text-white">
                 {nominee.full_name}

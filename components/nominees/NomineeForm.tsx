@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import ImageUploader from "@/components/upload/ImageUploader";
 import { createNomineeAction } from "@/app/actions/nominee/create";
 
 import { Button } from "@/components/ui/button";
@@ -33,6 +35,8 @@ export default function NomineeForm({
   electionId,
   categoryId,
 }: NomineeFormProps) {
+  const [imageUrl, setImageUrl] = useState("");
+
   return (
     <div className="mx-auto max-w-3xl rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
       <h1 className="text-3xl font-bold text-white">
@@ -91,14 +95,22 @@ export default function NomineeForm({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label className="text-white">
-            Image URL
+            Nominee Photo
           </Label>
 
+          <ImageUploader
+            bucket="nominees"
+            folder="photos"
+            onUpload={setImageUrl}
+          />
+
           <Input
+            type="hidden"
             name="image_url"
-            placeholder="https://..."
+            value={imageUrl}
+            readOnly
           />
         </div>
 
