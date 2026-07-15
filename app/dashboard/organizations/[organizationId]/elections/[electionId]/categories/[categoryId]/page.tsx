@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 import { getCategory } from "@/lib/categories";
-import { getNominees } from "@/lib/nominees";
+import { getNomineesWithVotes } from "@/lib/nominees";
 
 interface PageProps {
   params: Promise<{
@@ -27,7 +27,7 @@ export default async function CategoryPage({
     await getCategory(categoryId);
 
   const nominees =
-    await getNominees(categoryId);
+  await getNomineesWithVotes(categoryId);
 
   return (
     <div className="space-y-10">
@@ -50,6 +50,14 @@ export default async function CategoryPage({
           </Button>
         </Link>
       </div>
+
+      <Link
+        href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/${categoryId}/results`}
+      >
+       <Button variant="outline">
+        View Results
+       </Button>
+      </Link>
 
       {nominees.length === 0 ? (
         <div className="rounded-3xl border border-slate-800 bg-slate-900 p-12 text-center">
@@ -91,6 +99,15 @@ export default async function CategoryPage({
               <p className="mt-2 text-slate-400">
                 {nominee.biography}
               </p>
+              <div className="mt-4 rounded-xl bg-cyan-500/10 p-3 text-center">
+                <p className="text-sm text-slate-400">
+                  Total Votes
+                </p>
+
+                <p className="text-2xl font-bold text-cyan-400">
+                   {nominee.votes.length}
+                </p>
+              </div>
             </div>
           ))}
         </div>

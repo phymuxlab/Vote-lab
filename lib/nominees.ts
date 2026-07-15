@@ -33,3 +33,22 @@ export async function createNominee(data: {
 
   if (error) throw error;
 }
+export async function getNomineesWithVotes(
+  categoryId: string
+) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("nominees")
+    .select(`
+      *,
+      votes (
+        id
+      )
+    `)
+    .eq("category_id", categoryId);
+
+  if (error) throw error;
+
+  return data;
+}
