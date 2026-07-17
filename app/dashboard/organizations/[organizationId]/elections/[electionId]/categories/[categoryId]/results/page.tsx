@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { getCategory } from "@/lib/categories";
 import { getCategoryResults } from "@/lib/votes";
+import RealtimeResults from "@/components/voting/RealtimeResults";
 
 interface PageProps {
   params: Promise<{
@@ -36,6 +37,7 @@ export default async function ResultsPage({
 
   return (
     <div className="space-y-10">
+      <RealtimeResults categoryId={categoryId} />
       <div>
         <h1 className="text-4xl font-bold text-white">
           {category.name} Results

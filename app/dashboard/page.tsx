@@ -7,7 +7,11 @@ import {
   CheckCircle,
 } from "lucide-react";
 
+import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import StatsCard from "@/components/dashboard/StatsCard";
+import QuickActions from "@/components/dashboard/QuickActions";
+import RecentActivity from "@/components/dashboard/RecentActivity";
+
 import { getDashboardStats } from "@/lib/dashboard";
 
 export default async function DashboardPage() {
@@ -15,16 +19,19 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-10">
-      <div>
+      {/* Header */}
+      <div className="rounded-3xl border border-slate-800 bg-gradient-to-r from-cyan-600/20 via-slate-900 to-slate-900 p-8">
         <h1 className="text-4xl font-bold text-white">
-          Dashboard
+          Welcome back 👋
         </h1>
 
-        <p className="mt-2 text-slate-400">
-          Welcome back to Vote Lab.
+        <p className="mt-3 max-w-2xl text-slate-300">
+          Monitor your organizations, elections and voting
+          activities from one beautiful dashboard.
         </p>
       </div>
 
+      {/* Statistics */}
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         <StatsCard
           title="Organizations"
@@ -67,6 +74,17 @@ export default async function DashboardPage() {
           icon={BarChart3}
           color="bg-pink-600"
         />
+      </div>
+      <DashboardCharts />
+
+    <div className="grid gap-8 xl:grid-cols-3"></div>
+      {/* Bottom Section */}
+      <div className="grid gap-8 xl:grid-cols-3">
+        <div className="xl:col-span-2">
+          <QuickActions />
+        </div>
+
+        <RecentActivity />
       </div>
     </div>
   );

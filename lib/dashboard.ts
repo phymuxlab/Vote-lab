@@ -33,3 +33,48 @@ export async function getDashboardStats() {
     votes: votes.count ?? 0,
   };
 }
+export async function getDashboardDistribution() {
+  const supabase = await createClient();
+
+  const [
+    organizations,
+    elections,
+    nominees,
+    votes,
+  ] = await Promise.all([
+    supabase
+      .from("organizations")
+      .select("*", { count: "exact", head: true }),
+
+    supabase
+      .from("elections")
+      .select("*", { count: "exact", head: true }),
+
+    supabase
+      .from("nominees")
+      .select("*", { count: "exact", head: true }),
+
+    supabase
+      .from("votes")
+      .select("*", { count: "exact", head: true }),
+  ]);
+
+  return [
+    {
+      name: "Organizations",
+      value: organizations.count ?? 0,
+    },
+    {
+      name: "Elections",
+      value: elections.count ?? 0,
+    },
+    {
+      name: "Nominees",
+      value: nominees.count ?? 0,
+    },
+    {
+      name: "Votes",
+      value: votes.count ?? 0,
+    },
+  ];
+}

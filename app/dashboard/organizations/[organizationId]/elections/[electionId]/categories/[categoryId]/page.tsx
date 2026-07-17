@@ -23,11 +23,10 @@ export default async function CategoryPage({
     categoryId,
   } = await params;
 
-  const category =
-    await getCategory(categoryId);
+  const category = await getCategory(categoryId);
 
   const nominees =
-  await getNomineesWithVotes(categoryId);
+    await getNomineesWithVotes(categoryId);
 
   return (
     <div className="space-y-10">
@@ -42,22 +41,27 @@ export default async function CategoryPage({
           </p>
         </div>
 
-        <Link
-          href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/${categoryId}/create`}
-        >
-          <Button className="bg-cyan-500 text-black hover:bg-cyan-400">
-            + Add Nominee
-          </Button>
-        </Link>
-      </div>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/${categoryId}/results`}
+          >
+            <Button
+              variant="outline"
+              className="border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-black"
+            >
+              📊 View Results
+            </Button>
+          </Link>
 
-      <Link
-        href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/${categoryId}/results`}
-      >
-       <Button variant="outline">
-        View Results
-       </Button>
-      </Link>
+          <Link
+            href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/${categoryId}/create`}
+          >
+            <Button className="bg-cyan-500 text-black hover:bg-cyan-400">
+              + Add Nominee
+            </Button>
+          </Link>
+        </div>
+      </div>
 
       {nominees.length === 0 ? (
         <div className="rounded-3xl border border-slate-800 bg-slate-900 p-12 text-center">
@@ -77,35 +81,36 @@ export default async function CategoryPage({
               className="rounded-3xl border border-slate-800 bg-slate-900 p-6 transition hover:border-cyan-500 hover:bg-slate-800"
             >
               {nominee.image_url ? (
-                <div className="mb-4">
-                   <Image
-                   src={nominee.image_url}
-                   alt={nominee.full_name}
-                   width={112}
+                <div className="mb-4 flex justify-center">
+                  <Image
+                    src={nominee.image_url}
+                    alt={nominee.full_name}
+                    width={112}
                     height={112}
                     className="rounded-full border-2 border-cyan-500 object-cover"
-                    />
-                  </div>
+                  />
+                </div>
               ) : (
-                <div className="mb-4 flex h-28 w-28 items-center justify-center rounded-full bg-slate-800 text-4xl text-cyan-400">
+                <div className="mb-4 flex h-28 w-28 items-center justify-center rounded-full bg-slate-800 text-4xl text-cyan-400 mx-auto">
                   👤
                 </div>
               )}
 
-              <h2 className="text-2xl font-bold text-white">
+              <h2 className="text-center text-2xl font-bold text-white">
                 {nominee.full_name}
               </h2>
 
-              <p className="mt-2 text-slate-400">
+              <p className="mt-2 text-center text-slate-400">
                 {nominee.biography}
               </p>
-              <div className="mt-4 rounded-xl bg-cyan-500/10 p-3 text-center">
+
+              <div className="mt-6 rounded-xl bg-cyan-500/10 p-3 text-center">
                 <p className="text-sm text-slate-400">
                   Total Votes
                 </p>
 
                 <p className="text-2xl font-bold text-cyan-400">
-                   {nominee.votes.length}
+                  {nominee.votes.length}
                 </p>
               </div>
             </div>
