@@ -23,8 +23,6 @@ export async function castVote(data: {
 
   if (error) throw error;
 }
-import { createClient } from "@/lib/supabase/server";
-
 export async function getCategoryResults(
   categoryId: string
 ) {

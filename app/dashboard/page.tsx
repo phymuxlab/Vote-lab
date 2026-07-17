@@ -1,59 +1,71 @@
-import DashboardCard from "@/components/dashboard/DashboardCard";
-import { createClient } from "@/lib/supabase/server";
-
 import {
+  Building2,
   Vote,
-  Users,
   Trophy,
+  Users,
   BarChart3,
+  CheckCircle,
 } from "lucide-react";
 
-export default async function DashboardPage() {
-  const supabase = await createClient();
+import StatsCard from "@/components/dashboard/StatsCard";
+import { getDashboardStats } from "@/lib/dashboard";
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default async function DashboardPage() {
+  const stats = await getDashboardStats();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <h1 className="text-4xl font-bold text-white">
-          Welcome Back 👋
+          Dashboard
         </h1>
 
         <p className="mt-2 text-slate-400">
-          {user?.email ?? "No user logged in"}
+          Welcome back to Vote Lab.
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <DashboardCard
-          title="Total Elections"
-          value="12"
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <StatsCard
+          title="Organizations"
+          value={stats.organizations}
+          icon={Building2}
+          color="bg-blue-600"
+        />
+
+        <StatsCard
+          title="Elections"
+          value={stats.elections}
           icon={Vote}
           color="bg-cyan-600"
         />
 
-        <DashboardCard
-          title="Registered Voters"
-          value="3,248"
-          icon={Users}
+        <StatsCard
+          title="Published"
+          value={stats.published}
+          icon={CheckCircle}
           color="bg-green-600"
         />
 
-        <DashboardCard
-          title="Awards"
-          value="8"
+        <StatsCard
+          title="Categories"
+          value={stats.categories}
           icon={Trophy}
           color="bg-yellow-500"
         />
 
-        <DashboardCard
-          title="Votes Cast"
-          value="15,674"
-          icon={BarChart3}
+        <StatsCard
+          title="Nominees"
+          value={stats.nominees}
+          icon={Users}
           color="bg-purple-600"
+        />
+
+        <StatsCard
+          title="Votes"
+          value={stats.votes}
+          icon={BarChart3}
+          color="bg-pink-600"
         />
       </div>
     </div>
