@@ -10,37 +10,8 @@ export async function getDashboardStats() {
     categories,
     nominees,
     votes,
-  ] = await Promise.all([
-    supabase.from("organizations").select("*", { count: "exact", head: true }),
-    supabase.from("elections").select("*", { count: "exact", head: true }),
-    supabase
-      .from("elections")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "published"),
-    supabase
-      .from("election_categories")
-      .select("*", { count: "exact", head: true }),
-    supabase.from("nominees").select("*", { count: "exact", head: true }),
-    supabase.from("votes").select("*", { count: "exact", head: true }),
-  ]);
-
-  return {
-    organizations: organizations.count ?? 0,
-    elections: elections.count ?? 0,
-    published: published.count ?? 0,
-    categories: categories.count ?? 0,
-    nominees: nominees.count ?? 0,
-    votes: votes.count ?? 0,
-  };
-}
-export async function getDashboardDistribution() {
-  const supabase = await createClient();
-
-  const [
-    organizations,
-    elections,
-    nominees,
-    votes,
+    topNominees,
+    recentVotes,
   ] = await Promise.all([
     supabase
       .from("organizations")
@@ -51,30 +22,65 @@ export async function getDashboardDistribution() {
       .select("*", { count: "exact", head: true }),
 
     supabase
+       .from("elections")
+       .select("*", { count: "exact", head: true })
+        .eq("is_published", true),
+
+    supabase
+      .from("election_categories")
+      .select("*", { count: "exact", head: true }),
+
+    supabase
       .from("nominees")
       .select("*", { count: "exact", head: true }),
 
     supabase
       .from("votes")
       .select("*", { count: "exact", head: true }),
+
+    supabase
+      .from("nominees")
+      .select(
+        `
+        id,
+        full_name,
+        votes(id)
+      `
+      ),
+
+    supabase
+      .from("votes")
+      .select(
+        `
+        id,
+        created_at,
+        nominee:nominee_id(full_name)
+      `
+      )
+      .order("created_at", { ascending: false })
+      .limit(10),
   ]);
 
-  return [
-    {
-      name: "Organizations",
-      value: organizations.count ?? 0,
-    },
-    {
-      name: "Elections",
-      value: elections.count ?? 0,
-    },
-    {
-      name: "Nominees",
-      value: nominees.count ?? 0,
-    },
-    {
-      name: "Votes",
-      value: votes.count ?? 0,
-    },
-  ];
+  const leaderboard =
+    (topNominees.data ?? [])
+      .map((nominee) => ({
+        id: nominee.id,
+        full_name: nominee.full_name,
+        voteCount: nominee.votes?.length ?? 0,
+      }))
+      .sort((a, b) => b.voteCount - a.voteCount)
+      .slice(0, 5);
+
+  return {
+    organizations: organizations.count ?? 0,
+    elections: elections.count ?? 0,
+    published: published.count ?? 0,
+    categories: categories.count ?? 0,
+    nominees: nominees.count ?? 0,
+    votes: votes.count ?? 0,
+
+    leaderboard,
+
+    recentVotes: recentVotes.data ?? [],
+  };
 }

@@ -7,32 +7,37 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-import DashboardCharts from "@/components/dashboard/DashboardCharts";
+import RecentVotes from "@/components/dashboard/RecentVotes";
 import StatsCard from "@/components/dashboard/StatsCard";
+import VotesChart from "@/components/dashboard/VotesChart";
+import TopNominees from "@/components/dashboard/TopNominees";
 import QuickActions from "@/components/dashboard/QuickActions";
-import RecentActivity from "@/components/dashboard/RecentActivity";
 
 import { getDashboardStats } from "@/lib/dashboard";
+import { getVotesPerCategory } from "@/lib/analytics";
 
 export default async function DashboardPage() {
-  const stats = await getDashboardStats();
+  const [stats, chartData] = await Promise.all([
+    getDashboardStats(),
+    getVotesPerCategory(),
+  ]);
 
   return (
     <div className="space-y-10">
-      {/* Header */}
-      <div className="rounded-3xl border border-slate-800 bg-gradient-to-r from-cyan-600/20 via-slate-900 to-slate-900 p-8">
+      {/* Hero */}
+      <section className="overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-cyan-600/20 via-slate-900 to-slate-900 p-8">
         <h1 className="text-4xl font-bold text-white">
           Welcome back 👋
         </h1>
 
-        <p className="mt-3 max-w-2xl text-slate-300">
-          Monitor your organizations, elections and voting
-          activities from one beautiful dashboard.
+        <p className="mt-3 max-w-2xl text-slate-400">
+          Monitor organizations, elections, nominees and votes
+          from one central dashboard.
         </p>
-      </div>
+      </section>
 
       {/* Statistics */}
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         <StatsCard
           title="Organizations"
           value={stats.organizations}
@@ -74,18 +79,24 @@ export default async function DashboardPage() {
           icon={BarChart3}
           color="bg-pink-600"
         />
-      </div>
-      <DashboardCharts />
+      </section>
 
-    <div className="grid gap-8 xl:grid-cols-3"></div>
-      {/* Bottom Section */}
-      <div className="grid gap-8 xl:grid-cols-3">
+      {/* Analytics */}
+      <section className="grid gap-8 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <QuickActions />
+          <VotesChart data={chartData} />
         </div>
 
-        <RecentActivity />
-      </div>
+        <TopNominees nominees={stats.leaderboard} />
+      </section>
+      <section>
+  <RecentVotes votes={stats.recentVotes} />
+</section>
+
+      {/* Quick Actions */}
+      <section>
+        <QuickActions />
+      </section>
     </div>
   );
 }

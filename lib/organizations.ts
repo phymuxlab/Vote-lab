@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+
 export async function getOrganization(id: string) {
   const supabase = await createClient();
 
@@ -8,7 +9,7 @@ export async function getOrganization(id: string) {
     .eq("id", id)
     .single();
 
-  if (error) throw error;
+  if (error) return null;
 
-  return data as Organization;
+  return data;
 }

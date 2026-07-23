@@ -33,22 +33,56 @@ export async function createNominee(data: {
 
   if (error) throw error;
 }
+
 export async function getNomineesWithVotes(
   categoryId: string
 ) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  // Get nominees
+  const {
+    data: nominees,
+    error: nomineeError,
+  } = await supabase
     .from("nominees")
-    .select(`
-      *,
-      votes (
-        id
-      )
-    `)
+    .select("*")
+    .eq("category_id", categoryId)
+    .order("created_at", {
+      ascending: true,
+    });
+
+  if (nomineeError) {
+    console.log(
+      "NOMINEE ERROR:",
+      nomineeError
+    );
+    throw nomineeError;
+  }
+
+  // Get votes
+  const {
+    data: votes,
+    error: voteError,
+  } = await supabase
+    .from("votes")
+    .select("nominee_id")
     .eq("category_id", categoryId);
 
-  if (error) throw error;
+  if (voteError) {
+    console.log("VOTE ERROR:", voteError);
+    throw voteError;
+  }
 
-  return data;
+  return (nominees ?? []).map((nominee) => {
+    const voteCount =
+      votes?.filter(
+        (vote) =>
+          vote.nominee_id === nominee.id
+      ).length ?? 0;
+
+    return {
+      ...nominee,
+      votes: Array(voteCount).fill({}),
+    };
+  });
 }

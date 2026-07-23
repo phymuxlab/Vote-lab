@@ -57,7 +57,10 @@ export async function createElection(data: {
       ascending: false,
     });
 
-  if (error) throw error;
+  if (error) {
+  console.log("GET ELECTION ERROR:", error);
+  throw error;
+}
 
   return data as Election[];
 }
