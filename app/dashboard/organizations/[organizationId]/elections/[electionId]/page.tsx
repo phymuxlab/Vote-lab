@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Settings2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -34,10 +35,10 @@ export default async function ElectionDetailsPage({
 
   const stats =
     await getElectionStats(electionId);
-  
+
   const nominees =
-   await getTopNominees(electionId);
-  
+    await getTopNominees(electionId);
+
   const voteTimeline =
     await getVoteTimeline(electionId);
 
@@ -84,6 +85,18 @@ export default async function ElectionDetailsPage({
             />
 
             <Link
+              href={`/dashboard/organizations/${organizationId}/elections/${electionId}/settings`}
+            >
+              <Button
+                variant="outline"
+                className="border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-black"
+              >
+                <Settings2 className="mr-2 h-4 w-4" />
+                Settings
+              </Button>
+            </Link>
+
+            <Link
               href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/create`}
             >
               <Button className="bg-cyan-500 text-black hover:bg-cyan-400">
@@ -95,13 +108,15 @@ export default async function ElectionDetailsPage({
 
         </div>
       </div>
-<ElectionStats
-  stats={stats}
-  published={election.is_published}
-/>
-<TopNominees nominees={nominees} />
 
-<VoteTimeline data={voteTimeline} />
+      <ElectionStats
+        stats={stats}
+        published={election.is_published}
+      />
+
+      <TopNominees nominees={nominees} />
+
+      <VoteTimeline data={voteTimeline} />
 
       {/* Categories */}
 
