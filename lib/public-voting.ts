@@ -6,16 +6,19 @@ export async function getVotingCategories(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("categories")
+    .from("election_categories")
     .select("*")
     .eq("election_id", electionId)
     .order("created_at", {
       ascending: true,
     });
 
-  if (error) throw error;
+  if (error) {
+    console.error("Categories Error:", error);
+    throw error;
+  }
 
-  return data;
+  return data ?? [];
 }
 
 export async function getCategoryNominees(
@@ -31,28 +34,26 @@ export async function getCategoryNominees(
       ascending: true,
     });
 
-  if (error) throw error;
+  if (error) {
+    console.error("Nominees Error:", error);
+    throw error;
+  }
 
-  return data;
+  return data ?? [];
 }
 
 export async function getVotingData(
   electionId: string
 ) {
   const categories =
-    await getVotingCategories(
-      electionId
-    );
+    await getVotingCategories(electionId);
 
-  const data = await Promise.all(
+  return Promise.all(
     categories.map(async (category) => ({
       ...category,
-      nominees:
-        await getCategoryNominees(
-          category.id
-        ),
+      nominees: await getCategoryNominees(
+        category.id
+      ),
     }))
   );
-
-  return data;
 }

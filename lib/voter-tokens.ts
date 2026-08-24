@@ -31,7 +31,9 @@ export async function generateVotingToken(
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
   return data;
 }
@@ -52,7 +54,7 @@ export async function verifyVotingToken(
   if (error || !data) {
     return {
       valid: false,
-      reason: "Invalid token",
+      reason: "Invalid token.",
     };
   }
 
@@ -66,8 +68,7 @@ export async function verifyVotingToken(
 
   if (
     data.expires_at &&
-    new Date(data.expires_at) <
-      new Date()
+    new Date(data.expires_at) < new Date()
   ) {
     return {
       valid: false,
@@ -94,5 +95,7 @@ export async function markTokenAsUsed(
     })
     .eq("id", tokenId);
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 }

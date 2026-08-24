@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Settings2 } from "lucide-react";
+import { redirect, notFound } from "next/navigation";
+import { Settings2, BarChart3 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -27,27 +28,24 @@ export default async function ElectionDetailsPage({
   const { organizationId, electionId } =
     await params;
 
-  const election =
-    await getElection(electionId);
+ const election = await getElection(electionId);
 
-  const categories =
-    await getCategories(electionId);
+const categories = await getCategories(electionId);
 
-  const stats =
-    await getElectionStats(electionId);
+const stats = await getElectionStats(electionId);
 
-  const nominees =
-    await getTopNominees(electionId);
+const nominees = await getTopNominees(electionId);
 
-  const voteTimeline =
-    await getVoteTimeline(electionId);
+const voteTimeline = await getVoteTimeline(electionId);
+
 
   return (
     <div className="space-y-10">
 
-      {/* Election Hero */}
+      {/* Hero */}
 
       <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
+
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
           <div>
@@ -85,6 +83,15 @@ export default async function ElectionDetailsPage({
             />
 
             <Link
+              href={`/dashboard/organizations/${organizationId}/elections/${electionId}/results`}
+            >
+              <Button className="bg-emerald-500 text-black hover:bg-emerald-400">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                Results
+              </Button>
+            </Link>
+
+            <Link
               href={`/dashboard/organizations/${organizationId}/elections/${electionId}/settings`}
             >
               <Button
@@ -107,6 +114,7 @@ export default async function ElectionDetailsPage({
           </div>
 
         </div>
+
       </div>
 
       <ElectionStats
@@ -118,10 +126,9 @@ export default async function ElectionDetailsPage({
 
       <VoteTimeline data={voteTimeline} />
 
-      {/* Categories */}
-
       {categories.length === 0 ? (
         <div className="rounded-3xl border border-slate-800 bg-slate-900 p-12 text-center">
+
           <h2 className="text-2xl font-bold text-white">
             No Categories Yet
           </h2>
@@ -138,10 +145,13 @@ export default async function ElectionDetailsPage({
               Create First Category
             </Button>
           </Link>
+
         </div>
       ) : (
         <div>
+
           <div className="mb-6">
+
             <h2 className="text-2xl font-bold text-white">
               Categories
             </h2>
@@ -149,15 +159,18 @@ export default async function ElectionDetailsPage({
             <p className="mt-2 text-slate-400">
               Manage all election categories.
             </p>
+
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+
             {categories.map((category) => (
               <Link
                 key={category.id}
                 href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/${category.id}`}
                 className="group block rounded-3xl border border-slate-800 bg-slate-900 p-6 transition duration-300 hover:border-cyan-500 hover:bg-slate-800 hover:shadow-xl"
               >
+
                 <h2 className="text-2xl font-bold text-white">
                   {category.name}
                 </h2>
@@ -180,7 +193,9 @@ export default async function ElectionDetailsPage({
 
               </Link>
             ))}
+
           </div>
+
         </div>
       )}
 

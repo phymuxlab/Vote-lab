@@ -7,18 +7,46 @@ import RegistrationRequirements from "./RegistrationRequirements";
 import UniqueIdentifier from "./UniqueIdentifier";
 import SaveSettingsButton from "./SaveSettingsButton";
 
-export default function ElectionSettingsForm() {
-  const [mode, setMode] = useState("public");
+import { updateElectionSettings } from "@/app/actions/election-settings/update";
+
+interface ElectionSettingsFormProps {
+  organizationId: string;
+  electionId: string;
+  settings: any;
+}
+
+export default function ElectionSettingsForm({
+  organizationId,
+  electionId,
+}: ElectionSettingsFormProps) {
+ const [mode, setMode] = useState(
+  settings?.voting_mode ?? "public"
+);
 
   return (
-    <form className="space-y-8">
+    <form
+      action={updateElectionSettings}
+      className="space-y-8"
+    >
+      <input
+        type="hidden"
+        name="organizationId"
+        value={organizationId}
+      />
+
+      <input
+        type="hidden"
+        name="electionId"
+        value={electionId}
+      />
 
       <VotingMethod
         value={mode}
         onChange={setMode}
       />
 
-      {mode === "secure_registration" && (
+      {mode ===
+        "secure_registration" && (
         <>
           <RegistrationRequirements />
 
@@ -27,7 +55,6 @@ export default function ElectionSettingsForm() {
       )}
 
       <SaveSettingsButton />
-
     </form>
   );
 }

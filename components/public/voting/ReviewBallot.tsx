@@ -1,4 +1,5 @@
 interface ReviewBallotProps {
+  isSubmitting?: boolean;
   categories: {
     id: string;
     name: string;
@@ -20,6 +21,7 @@ export default function ReviewBallot({
   votes,
   onSubmit,
   onBack,
+  isSubmitting,
 }: ReviewBallotProps) {
   return (
     <div className="space-y-8">
@@ -75,11 +77,14 @@ export default function ReviewBallot({
         </button>
 
         <button
-          onClick={onSubmit}
-          className="rounded-xl bg-cyan-500 px-8 py-3 font-semibold text-black hover:bg-cyan-400"
-        >
-          Submit Vote
-        </button>
+  onClick={onSubmit}
+  disabled={isSubmitting}
+  className="rounded-xl bg-cyan-500 px-8 py-3 font-semibold text-black transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+>
+  {isSubmitting
+    ? "Submitting..."
+    : "Submit Vote"}
+</button>
 
       </div>
 

@@ -1,4 +1,4 @@
-import NomineeCard from "./NomineeCard";
+import NomineeCard from "@/components/public/voting/Nomineecard";
 
 interface Nominee {
   id: string;

@@ -5,6 +5,10 @@ import { useState } from "react";
 import VotingProgress from "./VotingProgress";
 import CategoryStep from "./CategoryStep";
 import ReviewBallot from "./ReviewBallot";
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+
+import { submitVote } from "@/app/actions/submit-vote";
 
 interface Nominee {
   id: string;
@@ -22,10 +26,16 @@ interface Category {
 }
 
 interface VotingWizardProps {
+  electionId: string;
+  voterId?: string | null;
+  tokenId?: string | null;
   categories: Category[];
 }
 
 export default function VotingWizard({
+  electionId,
+  voterId,
+  tokenId,
   categories,
 }: VotingWizardProps) {
   const [currentStep, setCurrentStep] =
@@ -34,9 +44,19 @@ export default function VotingWizard({
   const [reviewMode, setReviewMode] =
     useState(false);
 
+const [error, setError] =
+  useState("");
+
+const [isPending, startTransition] =
+  useTransition();
+
   const [votes, setVotes] = useState<
     Record<string, string>
   >({});
+
+  const router = useRouter();
+
+   
 
   const category = categories[currentStep];
 
@@ -65,22 +85,48 @@ export default function VotingWizard({
     }
   }
 
-  function submitVote() {
-    alert(
-      "Vote submission will be connected to Supabase in the next step."
+  async function handleSubmitVote() {
+  setError("");
+
+  startTransition(async () => {
+    const payload = Object.entries(votes).map(
+      ([categoryId, nomineeId]) => ({
+        categoryId,
+        nomineeId,
+      })
     );
-  }
+
+    const result = await submitVote({
+  electionId,
+  votes: payload,
+});
+
+    if (!result.success) {
+      setError(result.message);
+      return;
+    }
+
+    router.push(
+      `/elections/${electionId}/success`
+    );
+  });
+}
 
   if (reviewMode) {
     return (
       <div className="mx-auto max-w-5xl">
-
+{error && (
+  <div className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-red-300">
+    {error}
+  </div>
+)}
         <ReviewBallot
-          categories={categories}
-          votes={votes}
-          onBack={() => setReviewMode(false)}
-          onSubmit={submitVote}
-        />
+            categories={categories}
+  votes={votes}
+  onBack={() => setReviewMode(false)}
+  onSubmit={handleSubmitVote}
+  isSubmitting={isPending}
+/>
 
       </div>
     );

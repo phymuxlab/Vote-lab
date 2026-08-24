@@ -70,15 +70,18 @@ export default function ElectionLanding({
 
         <FadeUp delay={0.4}>
           <ElectionStats
-            totalCategories={totalCategories}
-            registeredVoters={registeredVoters}
-            votesCast={votesCast}
-            turnout={turnout}
-          />
+  totalCategories={totalCategories}
+  registeredVoters={registeredVoters}
+  votesCast={votesCast}
+  turnout={turnout}
+  votingMode={votingMode}
+/>
         </FadeUp>
 
         <FadeUp delay={0.5}>
-          <ElectionFeatures />
+         <ElectionFeatures
+  votingMode={votingMode}
+/>
         </FadeUp>
 
         <FadeUp delay={0.6}>

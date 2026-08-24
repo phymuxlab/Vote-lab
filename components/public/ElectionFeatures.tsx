@@ -3,10 +3,50 @@ import {
   KeyRound,
   BarChart3,
   Zap,
+  Lock,
+  UserCheck,
 } from "lucide-react";
 
-export default function ElectionFeatures() {
-  const features = [
+interface ElectionFeaturesProps {
+  votingMode: string;
+}
+
+export default function ElectionFeatures({
+  votingMode,
+}: ElectionFeaturesProps) {
+
+  const publicFeatures = [
+    {
+      icon: ShieldCheck,
+      title: "Secure Voting",
+      description:
+        "Every vote is securely recorded and protected.",
+      color: "text-green-400",
+    },
+    {
+      icon: Zap,
+      title: "Fast & Easy Voting",
+      description:
+        "Vote instantly without registration.",
+      color: "text-cyan-400",
+    },
+    {
+      icon: BarChart3,
+      title: "Transparent Results",
+      description:
+        "Results are counted fairly and accurately.",
+      color: "text-yellow-400",
+    },
+    {
+      icon: Lock,
+      title: "Privacy Protected",
+      description:
+        "Your voting choices remain confidential.",
+      color: "text-purple-400",
+    },
+  ];
+
+  const secureFeatures = [
     {
       icon: ShieldCheck,
       title: "Secure Voting",
@@ -22,20 +62,25 @@ export default function ElectionFeatures() {
       color: "text-cyan-400",
     },
     {
+      icon: UserCheck,
+      title: "Identity Verification",
+      description:
+        "Only verified voters can participate in this election.",
+      color: "text-blue-400",
+    },
+    {
       icon: BarChart3,
       title: "Transparent Results",
       description:
         "Election organizers decide when results become visible.",
       color: "text-yellow-400",
     },
-    {
-      icon: Zap,
-      title: "Fast & Reliable",
-      description:
-        "Powered by Vote Lab for a seamless voting experience.",
-      color: "text-purple-400",
-    },
   ];
+
+  const features =
+    votingMode === "secure_registration"
+      ? secureFeatures
+      : publicFeatures;
 
   return (
     <section className="space-y-8">
@@ -74,6 +119,7 @@ export default function ElectionFeatures() {
               <p className="mt-3 leading-7 text-slate-400">
                 {feature.description}
               </p>
+
             </div>
           );
         })}

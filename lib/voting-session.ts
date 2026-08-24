@@ -4,17 +4,23 @@ const COOKIE_NAME = "votelab_verified";
 
 export async function createVotingSession(
   electionId: string,
+  voterId: string,
   tokenId: string
 ) {
   const cookieStore = await cookies();
 
-  cookieStore.set(COOKIE_NAME, `${electionId}:${tokenId}`, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60, // 1 hour
-  });
+  cookieStore.set(
+    COOKIE_NAME,
+    `${electionId}:${voterId}:${tokenId}`,
+    {
+      httpOnly: true,
+      secure:
+        process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60,
+    }
+  );
 }
 
 export async function getVotingSession() {
@@ -23,13 +29,27 @@ export async function getVotingSession() {
   const value =
     cookieStore.get(COOKIE_NAME)?.value;
 
-  if (!value) return null;
+  if (!value) {
+    return null;
+  }
 
-  const [electionId, tokenId] =
-    value.split(":");
+  const [
+    electionId,
+    voterId,
+    tokenId,
+  ] = value.split(":");
+
+  if (
+    !electionId ||
+    !voterId ||
+    !tokenId
+  ) {
+    return null;
+  }
 
   return {
     electionId,
+    voterId,
     tokenId,
   };
 }

@@ -17,12 +17,12 @@ export default async function VotePage({
 }: PageProps) {
   const { electionId } = await params;
 
-  // Get election settings
-  const settings = await getElectionSettings(
-    electionId
-  );
+  const settings =
+    await getElectionSettings(electionId);
 
-  // Secure Registration Elections
+  let voterId: string | null = null;
+  let tokenId: string | null = null;
+
   if (
     settings?.voting_mode ===
     "secure_registration"
@@ -39,9 +39,11 @@ export default async function VotePage({
         `/elections/${electionId}/verify`
       );
     }
+
+    voterId = session.voterId;
+    tokenId = session.tokenId;
   }
 
-  // Load all voting data
   const votingData =
     await getVotingData(
       electionId
@@ -51,6 +53,9 @@ export default async function VotePage({
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950 px-6 py-12">
 
       <VotingWizard
+        electionId={electionId}
+        voterId={voterId}
+        tokenId={tokenId}
         categories={votingData}
       />
 
