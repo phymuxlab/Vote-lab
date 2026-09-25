@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
 import GoogleButton from "@/components/auth/GoogleButton";
 import AuthDivider from "@/components/auth/AuthDivider";
 import { Button } from "@/components/ui/button";
@@ -57,9 +57,10 @@ export default function LoginForm() {
     <Card className="w-full max-w-xl rounded-3xl border border-slate-800 bg-slate-900/80 shadow-2xl backdrop-blur-xl">
       <CardHeader className="space-y-3 pb-8 text-center">
         <CardTitle className="text-4xl font-bold text-white">
-          Welcome Back 👋
+          Welcome back
         </CardTitle>
 
+        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300"><Sparkles className="h-5 w-5" /></div>
         <CardDescription className="text-base text-slate-400">
           Sign in to continue to your Vote Lab account.
         </CardDescription>

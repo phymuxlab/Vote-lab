@@ -37,7 +37,7 @@ export default function ElectionCTA({
 
       <p className="mt-5 text-sm text-slate-500">
         By continuing, you agree to participate in this
-        election according to the organizer's rules.
+        election according to the organizer&apos;s rules.
       </p>
 
     </section>

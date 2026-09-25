@@ -34,8 +34,6 @@ interface VotingWizardProps {
 
 export default function VotingWizard({
   electionId,
-  voterId,
-  tokenId,
   categories,
 }: VotingWizardProps) {
   const [currentStep, setCurrentStep] =

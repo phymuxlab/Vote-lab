@@ -1,429 +1,99 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export interface RegisterVoterData {
   election_id: string;
-
   full_name?: string;
-
   email?: string;
-
   phone?: string;
-
   student_id?: string;
-
   employee_id?: string;
-
   national_id?: string;
 }
 
-/**
- * Allowed unique identifier fields.
- */
-const ALLOWED_IDENTIFIER_FIELDS = [
-  "email",
-  "phone",
-  "student_id",
-  "employee_id",
-  "national_id",
-];
+const ALLOWED_IDENTIFIER_FIELDS = ["email", "phone", "student_id", "employee_id", "national_id"] as const;
+type IdentifierField = (typeof ALLOWED_IDENTIFIER_FIELDS)[number];
 
-/**
- * Get election settings.
- */
-export async function getElectionSettings(
-  electionId: string
-) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("election_settings")
-    .select("*")
-    .eq("election_id", electionId)
-    .single();
-
-  if (error) {
-    console.error(
-      "GET ELECTION SETTINGS ERROR:",
-      error
-    );
-
-    throw error;
-  }
-
+export async function getElectionSettings(electionId: string) {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.from("election_settings").select("*").eq("election_id", electionId).single();
+  if (error) throw error;
   return data;
 }
 
-/**
- * Normalize identifier values before checking.
- *
- * Email is converted to lowercase.
- * Other identifiers are trimmed.
- */
-export function normalizeIdentifier(
-  field: string,
-  value: string
-) {
-  const normalized = value.trim();
-
-  if (field === "email") {
-    return normalized.toLowerCase();
-  }
-
-  return normalized;
+export function normalizeIdentifier(field: string, value: string) {
+  const normalized = value.replace(/[\u0000-\u001F\u007F]/g, "").trim();
+  return field === "email" ? normalized.toLowerCase() : normalized;
 }
 
-/**
- * Check whether a unique identifier
- * is already registered for an election.
- */
-export async function checkUniqueIdentifier(
-  electionId: string,
-  field: string,
-  value: string
-) {
-  const supabase = await createClient();
+export async function checkUniqueIdentifier(electionId: string, field: string, value: string) {
+  if (!ALLOWED_IDENTIFIER_FIELDS.includes(field as IdentifierField)) return { available: false, message: "Invalid identifier." };
+  const normalized = normalizeIdentifier(field, value);
+  if (!electionId || !normalized) return { available: false, message: "Please enter a valid identifier." };
 
-  const normalizedValue =
-    normalizeIdentifier(field, value);
-
-  if (
-    !electionId ||
-    !field ||
-    !normalizedValue
-  ) {
-    return {
-      available: false,
-      message:
-        "Please enter a valid identifier.",
-    };
-  }
-
-  if (
-    !ALLOWED_IDENTIFIER_FIELDS.includes(
-      field
-    )
-  ) {
-    return {
-      available: false,
-      message: "Invalid identifier.",
-    };
-  }
-
-  const { data, error } = await supabase
-    .from("voters")
-    .select("id")
-    .eq("election_id", electionId)
-    .eq(field, normalizedValue)
-    .limit(1);
-
-  if (error) {
-    console.error(
-      "CHECK UNIQUE IDENTIFIER ERROR:",
-      error
-    );
-
-    return {
-      available: false,
-      message:
-        "Unable to check identifier. Please try again.",
-    };
-  }
-
-  if (data && data.length > 0) {
-    return {
-      available: false,
-      message:
-        "This identifier is already registered for this election.",
-    };
-  }
-
-  return {
-    available: true,
-    message:
-      "Identifier available. You can continue.",
-  };
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.from("voters").select("id").eq("election_id", electionId).eq(field, normalized).limit(1);
+  if (error) return { available: false, message: "Unable to check identifier." };
+  return data?.length ? { available: false, message: "This identifier is not available for registration." } : { available: true, message: "Identifier available." };
 }
 
-/**
- * Check if voter already exists.
- *
- * Uses the exact same normalization
- * as checkUniqueIdentifier().
- */
-export async function voterExists(
-  electionId: string,
-  field: string,
-  value: string
-) {
-  if (
-    !ALLOWED_IDENTIFIER_FIELDS.includes(
-      field
-    )
-  ) {
-    throw new Error(
-      "Invalid identifier field."
-    );
-  }
-
-  const supabase = await createClient();
-
-  const normalizedValue =
-    normalizeIdentifier(field, value);
-
-  const { data, error } = await supabase
-    .from("voters")
-    .select("id")
-    .eq("election_id", electionId)
-    .eq(field, normalizedValue)
-    .limit(1);
-
-  if (error) {
-    console.error(
-      "VOTER EXISTS ERROR:",
-      error
-    );
-
-    throw error;
-  }
-
-  return !!(
-    data &&
-    data.length > 0
-  );
+export async function voterExists(electionId: string, field: string, value: string) {
+  if (!ALLOWED_IDENTIFIER_FIELDS.includes(field as IdentifierField)) throw new Error("Invalid identifier field.");
+  const supabase = createAdminClient();
+  const normalized = normalizeIdentifier(field, value);
+  const { data, error } = await supabase.from("voters").select("id").eq("election_id", electionId).eq(field, normalized).limit(1);
+  if (error) throw error;
+  return Boolean(data?.length);
 }
 
-/**
- * Register voter.
- *
- * This version contains temporary diagnostics
- * to identify which Supabase request is causing
- * ECONNRESET.
- */
-export async function registerVoter(
-  voter: RegisterVoterData
-) {
-  console.log(
-    "========== REGISTER VOTER =========="
-  );
+export async function registerVoter(voter: RegisterVoterData) {
+  const supabase = createAdminClient();
+  const { data: election, error: electionError } = await supabase
+    .from("elections")
+    .select("id, is_published, status, start_date, end_date")
+    .eq("id", voter.election_id)
+    .maybeSingle();
 
-  console.log(
-    "Election:",
-    voter.election_id
-  );
-
-  console.log(
-    "Email:",
-    voter.email
-  );
-
-  /*
-   * STEP 1
-   *
-   * Get election settings.
-   */
-  console.log(
-    "STEP 1: Fetching election settings..."
-  );
-
-  let settings;
-
-  try {
-    settings =
-      await getElectionSettings(
-        voter.election_id
-      );
-
-    console.log(
-      "STEP 1 SUCCESS:",
-      settings
-    );
-  } catch (error) {
-    console.error(
-      "STEP 1 FAILED:",
-      error
-    );
-
-    throw error;
+  if (electionError || !election) throw new Error("Election not found.");
+  if (!election.is_published || !["published", "active"].includes(election.status)) {
+    throw new Error("This election is not currently open for registration.");
   }
+  const now = new Date();
+  if (new Date(election.start_date) > now) throw new Error("Registration is not open yet.");
+  if (new Date(election.end_date) <= now) throw new Error("This election has ended.");
 
-  /*
-   * Determine the configured
-   * unique identifier.
-   */
-  const uniqueField =
-    settings.unique_identifier;
+  const settings = await getElectionSettings(voter.election_id);
+  if (settings.voting_mode !== "secure_registration") throw new Error("This election does not use secure voter registration.");
+  if (settings.require_name && !voter.full_name) throw new Error("Full name is required.");
+  if (settings.require_email && !voter.email) throw new Error("Email is required.");
+  if (settings.require_phone && !voter.phone) throw new Error("Phone number is required.");
+  if (settings.require_student_id && !voter.student_id) throw new Error("Student ID is required.");
+  if (settings.require_employee_id && !voter.employee_id) throw new Error("Employee ID is required.");
+  if (settings.require_national_id && !voter.national_id) throw new Error("National ID is required.");
 
-  console.log(
-    "Unique field:",
-    uniqueField
-  );
-
-  if (
-    !ALLOWED_IDENTIFIER_FIELDS.includes(
-      uniqueField
-    )
-  ) {
-    throw new Error(
-      `Invalid unique identifier configured: ${uniqueField}`
-    );
+  const configuredIdentifier = settings.unique_identifier;
+  if (!ALLOWED_IDENTIFIER_FIELDS.includes(configuredIdentifier as IdentifierField)) {
+    throw new Error("Invalid unique identifier configured.");
   }
+  const uniqueField = configuredIdentifier as IdentifierField;
 
-  const uniqueValue =
-    (voter as any)[uniqueField];
+  const uniqueValue = voter[uniqueField];
+  if (!uniqueValue) throw new Error(`${uniqueField} is required.`);
 
-  console.log(
-    "Unique value:",
-    uniqueValue
-  );
-
-  if (!uniqueValue) {
-    throw new Error(
-      `${uniqueField} is required.`
-    );
-  }
-
-  /*
-   * Normalize all identifiers
-   * before inserting.
-   */
   const normalizedVoter = {
     ...voter,
-
-    email: voter.email
-      ? normalizeIdentifier(
-          "email",
-          voter.email
-        )
-      : undefined,
-
-    phone: voter.phone
-      ? normalizeIdentifier(
-          "phone",
-          voter.phone
-        )
-      : undefined,
-
-    student_id: voter.student_id
-      ? normalizeIdentifier(
-          "student_id",
-          voter.student_id
-        )
-      : undefined,
-
-    employee_id:
-      voter.employee_id
-        ? normalizeIdentifier(
-            "employee_id",
-            voter.employee_id
-          )
-        : undefined,
-
-    national_id:
-      voter.national_id
-        ? normalizeIdentifier(
-            "national_id",
-            voter.national_id
-          )
-        : undefined,
+    full_name: voter.full_name?.replace(/[\u0000-\u001F\u007F]/g, "").trim().slice(0, 120),
+    email: voter.email ? normalizeIdentifier("email", voter.email).slice(0, 254) : undefined,
+    phone: voter.phone ? normalizeIdentifier("phone", voter.phone).slice(0, 40) : undefined,
+    student_id: voter.student_id ? normalizeIdentifier("student_id", voter.student_id).slice(0, 80) : undefined,
+    employee_id: voter.employee_id ? normalizeIdentifier("employee_id", voter.employee_id).slice(0, 80) : undefined,
+    national_id: voter.national_id ? normalizeIdentifier("national_id", voter.national_id).slice(0, 80) : undefined,
   };
 
-  const normalizedUniqueValue =
-    (normalizedVoter as any)[
-      uniqueField
-    ];
-
-  if (!normalizedUniqueValue) {
-    throw new Error(
-      `${uniqueField} is required.`
-    );
+  if (await voterExists(voter.election_id, uniqueField, normalizedVoter[uniqueField] ?? "")) {
+    throw new Error("You have already registered for this election.");
   }
 
-  /*
-   * STEP 2
-   *
-   * Check database again.
-   *
-   * This protects us even if the frontend
-   * identifier checker says the identifier
-   * is available.
-   */
-  console.log(
-    "STEP 2: Checking existing voter..."
-  );
-
-  try {
-    const exists =
-      await voterExists(
-        voter.election_id,
-        uniqueField,
-        normalizedUniqueValue
-      );
-
-    if (exists) {
-      console.log(
-        "STEP 2 RESULT: Voter already exists."
-      );
-
-      throw new Error(
-        "You have already registered for this election."
-      );
-    }
-
-    console.log(
-      "STEP 2 SUCCESS: Identifier available."
-    );
-  } catch (error) {
-    console.error(
-      "STEP 2 FAILED:",
-      error
-    );
-
-    throw error;
-  }
-
-  /*
-   * STEP 3
-   *
-   * Insert voter into database.
-   */
-  console.log(
-    "STEP 3: Inserting voter..."
-  );
-
-  const supabase =
-    await createClient();
-
-  try {
-    const {
-      data,
-      error,
-    } = await supabase
-      .from("voters")
-      .insert(normalizedVoter)
-      .select()
-      .single();
-
-    if (error) {
-      console.error(
-        "STEP 3 DATABASE ERROR:",
-        error
-      );
-
-      throw error;
-    }
-
-    console.log(
-      "STEP 3 SUCCESS: Voter created:",
-      data.id
-    );
-
-    return data;
-  } catch (error) {
-    console.error(
-      "STEP 3 FAILED:",
-      error
-    );
-
-    throw error;
-  }
+  const { data, error } = await supabase.from("voters").insert(normalizedVoter).select("id, election_id").single();
+  if (error) throw error;
+  return data;
 }

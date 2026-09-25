@@ -1,6 +1,7 @@
 "use server";
 
 import { verifyVotingToken } from "@/lib/voter-tokens";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 export interface CheckTokenResult {
   valid: boolean;
@@ -30,6 +31,7 @@ export async function checkTokenAction(
   }
 
   try {
+    await enforceRateLimit(`verify-token:${electionId}`, 30, 900);
     const result = await verifyVotingToken(
       electionId,
       normalizedToken
@@ -47,12 +49,7 @@ export async function checkTokenAction(
       message:
         "Token verified. You can continue.",
     };
-  } catch (error) {
-    console.error(
-      "CHECK TOKEN ERROR:",
-      error
-    );
-
+  } catch {
     return {
       valid: false,
       message:

@@ -9,24 +9,5 @@ import CTA from "@/components/sections/CTA";
 import Footer from "@/components/sections/Footer";
 
 export default function Home() {
-  return (
-<main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-black text-white">   
-  <div className="absolute top-0 left-0 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl"></div>
-  <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl"></div>  
-  <div className="relative z-10">
-      <Navbar />
-      <Hero />
-      <Stats />
-      <Features />
-      <VotingPreview />
-      <Testimonials />
-      <CTA />
-      <FAQ />
-      <Footer />
- 
-  </div>
-      
-      
-    </main>
-  );
+  return <main id="main-content" className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-black text-white"><div className="pointer-events-none absolute left-0 top-0 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" /><div className="pointer-events-none absolute bottom-0 right-0 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl" /><div className="relative z-10"><Navbar /><Hero /><Stats /><Features /><VotingPreview /><Testimonials /><CTA /><FAQ /><Footer /></div></main>;
 }

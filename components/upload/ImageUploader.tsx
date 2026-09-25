@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
@@ -94,11 +95,15 @@ export default function ImageUploader({
       </div>
 
       {preview && (
-        <img
-          src={preview}
-          alt="Preview"
-          className="h-52 w-full rounded-2xl object-cover"
-        />
+        <div className="relative h-52 w-full overflow-hidden rounded-2xl">
+          <Image
+            src={preview}
+            alt="Preview"
+            fill
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="object-cover"
+          />
+        </div>
       )}
     </div>
   );

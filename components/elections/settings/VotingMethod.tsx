@@ -1,8 +1,10 @@
 "use client";
 
+type VotingMode = "public" | "secure_registration";
+
 interface VotingMethodProps {
-  value: string;
-  onChange: (value: string) => void;
+  value: VotingMode;
+  onChange: (value: VotingMode) => void;
 }
 
 export default function VotingMethod({

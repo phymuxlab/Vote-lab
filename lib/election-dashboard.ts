@@ -1,84 +1,32 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { requireElectionOwner } from "@/lib/auth/authorization";
 
-export async function getElectionStats(
-  electionId: string
-) {
-  const supabase = await createClient();
+export async function getElectionStats(electionId: string) {
+  await requireElectionOwner(electionId);
+  const supabase = createAdminClient();
 
-  // Get categories for this election
-  const {
-    data: categories,
-    error: categoryError,
-  } = await supabase
+  const { data: categories, error: categoryError } = await supabase
     .from("election_categories")
     .select("id")
     .eq("election_id", electionId);
+  if (categoryError) throw categoryError;
 
-  if (categoryError) {
-    console.log(
-      "CATEGORY STATS ERROR:",
-      categoryError
-    );
-    throw categoryError;
-  }
-
-  const categoryIds =
-    categories?.map(
-      (category) => category.id
-    ) ?? [];
-
-
-  // Count nominees through category_id
+  const categoryIds = (categories ?? []).map((category) => category.id);
   let nomineeCount = 0;
-
-  if (categoryIds.length > 0) {
-    const {
-      count,
-      error: nomineeError,
-    } = await supabase
+  if (categoryIds.length) {
+    const { count, error } = await supabase
       .from("nominees")
-      .select("*", {
-        count: "exact",
-        head: true,
-      })
+      .select("id", { count: "exact", head: true })
       .in("category_id", categoryIds);
-
-    if (nomineeError) {
-      console.log(
-        "NOMINEE STATS ERROR:",
-        nomineeError
-      );
-      throw nomineeError;
-    }
-
+    if (error) throw error;
     nomineeCount = count ?? 0;
   }
 
-
-  // Votes already have election_id
-  const {
-    count: voteCount,
-    error: voteError,
-  } = await supabase
+  const { count: voteCount, error: voteError } = await supabase
     .from("votes")
-    .select("*", {
-      count: "exact",
-      head: true,
-    })
+    .select("id", { count: "exact", head: true })
     .eq("election_id", electionId);
+  if (voteError) throw voteError;
 
-  if (voteError) {
-    console.log(
-      "VOTE STATS ERROR:",
-      voteError
-    );
-    throw voteError;
-  }
-
-
-  return {
-    categories: categoryIds.length,
-    nominees: nomineeCount,
-    votes: voteCount ?? 0,
-  };
+  return { categories: categoryIds.length, nominees: nomineeCount, votes: voteCount ?? 0 };
 }

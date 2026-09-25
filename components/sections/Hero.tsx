@@ -1,46 +1,9 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Hero() {
-  return (
-<motion.section
-  initial={{ opacity: 0, y: 50 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.8 }}
-  className="max-w-7xl mx-auto px-6 pt-40 pb-20"
->
-        <div className="text-center">
-
-          <span className="inline-block px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium">
-            🎓 Trusted Student Voting Platform
-          </span>
-
-          <h1 className="mt-8 text-5xl md:text-7xl font-extrabold leading-tight">
-            Where
-            <span className="text-cyan-400"> Student Voices </span>
-            Count.
-          </h1>
-
-          <p className="mt-8 max-w-2xl mx-auto text-slate-400 text-lg">
-            Vote Lab is a secure online voting platform for universities,
-            student awards, departmental elections, campus competitions,
-            and every student event that deserves transparency.
-          </p>
-
-          <div className="mt-10 flex flex-wrap justify-center gap-5">
-
-            <button className="bg-cyan-500 hover:bg-cyan-600 px-8 py-4 rounded-xl font-semibold transition">
-              Start Voting
-            </button>
-
-            <button className="border border-slate-700 hover:border-cyan-400 px-8 py-4 rounded-xl transition">
-              Explore Events
-            </button>
-
-          </div>
-
-        </div>
-      </motion.section>
-  );
+  return <motion.section initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="mx-auto max-w-7xl px-6 pb-20 pt-32 sm:pt-40"><div className="mx-auto max-w-4xl text-center"><span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-300"><ShieldCheck className="h-4 w-4" /> Secure digital voting for modern communities</span><h1 className="mt-8 text-5xl font-extrabold leading-[1.02] tracking-[-0.04em] sm:text-7xl">Where every <span className="bg-gradient-to-r from-cyan-300 to-indigo-400 bg-clip-text text-transparent">voice counts.</span></h1><p className="mx-auto mt-7 max-w-2xl text-base leading-8 text-slate-400 sm:text-lg">Create public or secure elections, manage nominees and deliver a voting experience that feels trustworthy from the first click to the final result.</p><div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/vote" className="inline-flex h-12 items-center justify-center rounded-xl bg-cyan-400 px-6 font-semibold text-slate-950 transition hover:bg-cyan-300">Explore elections <ArrowRight className="ml-2 h-4 w-4" /></Link><Link href="/register" className="inline-flex h-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-6 font-semibold text-white hover:bg-white/[0.07]">Create organiser account</Link></div></div></motion.section>;
 }

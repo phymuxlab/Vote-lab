@@ -1,95 +1,55 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { requireOrganizationOwner } from "@/lib/auth/authorization";
 
-export async function getOrganizationStats(
-  organizationId: string
-) {
-  const supabase = await createClient();
+export async function getOrganizationStats(organizationId: string) {
+  await requireOrganizationOwner(organizationId);
+  const supabase = createAdminClient();
 
-  const { count: elections } = await supabase
+  const { count: elections, error: electionError } = await supabase
     .from("elections")
-    .select("*", {
-      head: true,
-      count: "exact",
-    })
+    .select("id", { head: true, count: "exact" })
     .eq("organization_id", organizationId);
+  if (electionError) throw electionError;
 
-  const electionIds =
-    (
-      await supabase
-        .from("elections")
-        .select("id")
-        .eq("organization_id", organizationId)
-    ).data ?? [];
+  const { data: electionRows, error: electionRowsError } = await supabase
+    .from("elections")
+    .select("id")
+    .eq("organization_id", organizationId);
+  if (electionRowsError) throw electionRowsError;
 
-  const ids = electionIds.map((e) => e.id);
+  const ids = (electionRows ?? []).map((e) => e.id);
+  if (!ids.length) return { elections: elections ?? 0, categories: 0, nominees: 0, votes: 0 };
 
-  let categories = 0;
-  let nominees = 0;
+  const { data: categoryRows, error: categoryError } = await supabase
+    .from("election_categories")
+    .select("id")
+    .in("election_id", ids);
+  if (categoryError) throw categoryError;
+
+  const categoryIds = (categoryRows ?? []).map((c) => c.id);
+  if (!categoryIds.length) return { elections: elections ?? 0, categories: 0, nominees: 0, votes: 0 };
+
+  const { data: nomineeRows, error: nomineeError } = await supabase
+    .from("nominees")
+    .select("id")
+    .in("category_id", categoryIds);
+  if (nomineeError) throw nomineeError;
+
+  const nomineeIds = (nomineeRows ?? []).map((n) => n.id);
   let votes = 0;
-
-  if (ids.length) {
-    const categoryQuery =
-      await supabase
-        .from("election_categories")
-        .select("id", {
-          head: true,
-          count: "exact",
-        })
-        .in("election_id", ids);
-
-    categories = categoryQuery.count ?? 0;
-
-    const categoryIds =
-      (
-        await supabase
-          .from("election_categories")
-          .select("id")
-          .in("election_id", ids)
-      ).data ?? [];
-
-    const cIds = categoryIds.map((c) => c.id);
-
-    if (cIds.length) {
-      const nomineeQuery =
-        await supabase
-          .from("nominees")
-          .select("*", {
-            head: true,
-            count: "exact",
-          })
-          .in("category_id", cIds);
-
-      nominees = nomineeQuery.count ?? 0;
-
-      const nomineeIds =
-        (
-          await supabase
-            .from("nominees")
-            .select("id")
-            .in("category_id", cIds)
-        ).data ?? [];
-
-      const nIds = nomineeIds.map((n) => n.id);
-
-      if (nIds.length) {
-        const voteQuery =
-          await supabase
-            .from("votes")
-            .select("*", {
-              head: true,
-              count: "exact",
-            })
-            .in("nominee_id", nIds);
-
-        votes = voteQuery.count ?? 0;
-      }
-    }
+  if (nomineeIds.length) {
+    const { count, error: voteError } = await supabase
+      .from("votes")
+      .select("id", { head: true, count: "exact" })
+      .in("nominee_id", nomineeIds);
+    if (voteError) throw voteError;
+    votes = count ?? 0;
   }
 
   return {
     elections: elections ?? 0,
-    categories,
-    nominees,
+    categories: categoryIds.length,
+    nominees: nomineeIds.length,
     votes,
   };
 }

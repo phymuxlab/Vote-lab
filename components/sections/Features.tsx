@@ -1,59 +1,9 @@
-export default function Features() {
-  const features = [
-    {
-      title: "Secure Voting",
-      description:
-        "Every vote is securely recorded with fraud prevention and transparent results.",
-      icon: "🛡️",
-    },
-    {
-      title: "Fast Results",
-      description:
-        "View live vote counts and instant results after elections or awards end.",
-      icon: "⚡",
-    },
-    {
-      title: "Student Focused",
-      description:
-        "Designed specifically for universities, colleges, departments, clubs and associations.",
-      icon: "🎓",
-    },
-  ];
+import { Gauge, GraduationCap, ShieldCheck } from "lucide-react";
 
-  return (
-    <section 
-    id="features"
-    className="max-w-7xl mx-auto px-6 py-24"
-    >
-      <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold">
-          Why Choose <span className="text-cyan-400">Vote Lab?</span>
-        </h2>
+const features = [
+  { title: "Secure voting", description: "Support controlled voter registration, one-time tokens and server-side vote validation.", icon: ShieldCheck },
+  { title: "Fast insights", description: "Keep organisers close to participation, election activity and results from one workspace.", icon: Gauge },
+  { title: "Built for communities", description: "Designed for campuses, departments, clubs, associations and events with responsive voting flows.", icon: GraduationCap },
+];
 
-        <p className="text-slate-400 mt-4 max-w-2xl mx-auto">
-          Built for modern student communities with speed, security and
-          transparency at its core.
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-8">
-        {features.map((feature) => (
-          <div
-            key={feature.title}
-            className="rounded-2xl border border-slate-800 bg-slate-900 p-8 hover:border-cyan-500 transition duration-300"
-          >
-            <div className="text-5xl mb-5">{feature.icon}</div>
-
-            <h3 className="text-2xl font-semibold mb-3">
-              {feature.title}
-            </h3>
-
-            <p className="text-slate-400">
-              {feature.description}
-            </p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
+export default function Features() { return <section id="features" className="mx-auto max-w-7xl px-6 py-24"><div className="mb-14 text-center"><p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Built for organisers</p><h2 className="mt-3 text-4xl font-bold">Everything around the ballot.</h2><p className="mx-auto mt-4 max-w-2xl text-slate-400">A focused toolkit for setting up elections, managing participation and keeping the voter experience clear.</p></div><div className="grid gap-5 md:grid-cols-3">{features.map(({ title, description, icon: Icon }) => <div key={title} className="rounded-3xl border border-white/8 bg-white/[0.035] p-7 transition hover:-translate-y-1 hover:border-cyan-400/20 hover:bg-white/[0.05]"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300"><Icon className="h-6 w-6" /></div><h3 className="mt-6 text-xl font-semibold text-white">{title}</h3><p className="mt-3 leading-7 text-slate-500">{description}</p></div>)}</div></section>; }

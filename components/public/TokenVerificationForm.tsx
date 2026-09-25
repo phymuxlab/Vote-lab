@@ -61,31 +61,16 @@ const normalizedToken = token
 .trim()
 .toUpperCase();
 
-
 /*
- * Don't check until exactly 8 characters
- * have been entered.
+ * Only run the asynchronous token check once the
+ * input has the correct shape. Input validation and
+ * clearing stale state are handled in handleTokenChange,
+ * so this effect does not synchronously update React state.
  */
-if (normalizedToken.length !== 8) {
-  setCheckState({
-    checked: false,
-    valid: false,
-  });
-
-  return;
-}
-
-/*
- * Token must contain only A-F and 0-9.
- */
-if (!/^[A-F0-9]{8}$/.test(normalizedToken)) {
-  setCheckState({
-    checked: true,
-    valid: false,
-    message:
-      "Token must contain only letters A-F and numbers 0-9.",
-  });
-
+if (
+  normalizedToken.length !== 8 ||
+  !/^[A-F0-9]{8}$/.test(normalizedToken)
+) {
   return;
 }
 
@@ -111,13 +96,8 @@ const timer = setTimeout(() => {
         valid: result.valid,
         message: result.message,
       });
-    } catch (error) {
+    } catch {
       if (cancelled) return;
-
-      console.error(
-        "TOKEN CHECK ERROR:",
-        error
-      );
 
       setCheckState({
         checked: true,
@@ -150,12 +130,23 @@ setToken(normalized);
 
 /*
  * Changing the token clears the previous
- * database verification result.
+ * database verification result. If the input
+ * is already 8 characters but has an invalid
+ * format, show that validation immediately.
  */
-setCheckState({
-  checked: false,
-  valid: false,
-});
+if (normalized.length === 8 && !/^[A-F0-9]{8}$/.test(normalized)) {
+  setCheckState({
+    checked: true,
+    valid: false,
+    message:
+      "Token must contain only letters A-F and numbers 0-9.",
+  });
+} else {
+  setCheckState({
+    checked: false,
+    valid: false,
+  });
+}
 
 setVerifyState({
   success: false,
@@ -179,12 +170,7 @@ setVerifyState({
   .slice(0, 8);
 
   handleTokenChange(normalized);
-  } catch (error) {
-  console.error(
-  "PASTE TOKEN ERROR:",
-  error
-  );
-
+  } catch {
   setVerifyState({
   success: false,
   message:
@@ -238,11 +224,6 @@ try {
   ) {
     throw error;
   }
-
-  console.error(
-    "TOKEN VERIFICATION ERROR:",
-    error
-  );
 
   setVerifyState({
     success: false,

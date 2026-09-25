@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Settings2, BarChart3 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,10 @@ export default async function ElectionDetailsPage({
     await params;
 
  const election = await getElection(electionId);
+
+  if (election.organization_id !== organizationId) {
+    notFound();
+  }
 
 const categories = await getCategories(electionId);
 

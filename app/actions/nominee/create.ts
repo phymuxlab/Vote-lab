@@ -1,38 +1,35 @@
 "use server";
 
 import { redirect } from "next/navigation";
-
 import { createNominee } from "@/lib/nominees";
+import { requireCategoryOwner } from "@/lib/auth/authorization";
+import { cleanText, requiredText } from "@/lib/validation";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
-export async function createNomineeAction(
-  formData: FormData
-) {
-  const organizationId =
-    formData.get("organization_id") as string;
+export async function createNomineeAction(formData: FormData) {
+  const organizationId = requiredText(formData.get("organization_id"), "Organization", 64);
+  const electionId = requiredText(formData.get("election_id"), "Election", 64);
+  const categoryId = requiredText(formData.get("category_id"), "Category", 64);
 
-  const electionId =
-    formData.get("election_id") as string;
+  const { category } = await requireCategoryOwner(categoryId);
+  if (category.election_id !== electionId) throw new Error("Category does not belong to this election.");
 
-  const categoryId =
-    formData.get("category_id") as string;
+  await enforceRateLimit(`create-nominee:${electionId}`, 100, 3600);
 
-  const full_name =
-    formData.get("full_name") as string;
+  const fullName = requiredText(formData.get("full_name"), "Nominee name", 120);
+  const biography = cleanText(formData.get("biography"), 2000);
+  const imageUrl = cleanText(formData.get("image_url"), 2048);
 
-  const biography =
-    formData.get("biography") as string;
-
-  const image_url =
-    formData.get("image_url") as string;
+  if (imageUrl && !/^https:\/\//i.test(imageUrl)) {
+    throw new Error("Nominee image URL must use HTTPS.");
+  }
 
   await createNominee({
     category_id: categoryId,
-    full_name,
+    full_name: fullName,
     biography,
-    image_url,
+    image_url: imageUrl,
   });
 
-  redirect(
-    `/dashboard/organizations/${organizationId}/elections/${electionId}/categories/${categoryId}`
-  );
+  redirect(`/dashboard/organizations/${organizationId}/elections/${electionId}`);
 }

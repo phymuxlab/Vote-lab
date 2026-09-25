@@ -14,12 +14,6 @@ interface PageProps {
   }>;
 }
 
-interface ResultsSummaryProps {
-  categories: number;
-  totalVotes: number;
-  winner: string;
-  averageVotes: number;
-}
 
 export default async function ResultsPage({
   params,

@@ -57,7 +57,7 @@ export default function ForgotPasswordForm() {
         </CardTitle>
 
         <CardDescription className="text-base text-slate-400">
-          Enter your email address and we'll send you a password reset link.
+          Enter your email address and we&apos;ll send you a password reset link.
         </CardDescription>
       </CardHeader>
 
@@ -73,7 +73,7 @@ export default function ForgotPasswordForm() {
 
               <p className="mt-2 text-slate-400">
                 If an account exists for <strong>{email}</strong>,
-                you'll receive a password reset link shortly.
+                you&apos;ll receive a password reset link shortly.
               </p>
             </div>
 

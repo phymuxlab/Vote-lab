@@ -1,35 +1,26 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { requireOrganizationOwner } from "@/lib/auth/authorization";
 
-export async function getRecentActivity(
-  organizationId: string
-) {
-  const supabase = await createClient();
+export async function getRecentActivity(organizationId: string) {
+  await requireOrganizationOwner(organizationId);
+  const supabase = createAdminClient();
 
-  const { data: elections } = await supabase
+  const { data: elections, error: electionError } = await supabase
     .from("elections")
     .select("id")
     .eq("organization_id", organizationId);
+  if (electionError) throw electionError;
 
-  if (!elections?.length) return [];
+  const electionIds = (elections ?? []).map((e) => e.id);
+  if (!electionIds.length) return [];
 
-  const electionIds = elections.map((e) => e.id);
-
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("votes")
-    .select(`
-      id,
-      created_at,
-      nominees (
-        full_name,
-        election_categories (
-          name
-        )
-      )
-    `)
-    .order("created_at", {
-      ascending: false,
-    })
+    .select("id, created_at, nominees:nominee_id(full_name)")
+    .in("election_id", electionIds)
+    .order("created_at", { ascending: false })
     .limit(10);
 
+  if (error) throw error;
   return data ?? [];
 }

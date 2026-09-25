@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 interface ElectionCountdownProps {
   endDate: string;
@@ -20,73 +20,66 @@ const EMPTY_TIME: TimeLeft = {
   seconds: 0,
 };
 
-function calculateTimeLeft(
-  endDate: string
-): TimeLeft {
-  const difference =
-    new Date(endDate).getTime() -
-    Date.now();
+function calculateTimeLeft(endDate: string, now: number): TimeLeft {
+  const difference = new Date(endDate).getTime() - now;
 
-  if (difference <= 0) {
+  if (now === 0 || difference <= 0) {
     return EMPTY_TIME;
   }
 
   return {
-    days: Math.floor(
-      difference /
-        (1000 * 60 * 60 * 24)
-    ),
-
-    hours: Math.floor(
-      (difference /
-        (1000 * 60 * 60)) %
-        24
-    ),
-
-    minutes: Math.floor(
-      (difference /
-        (1000 * 60)) %
-        60
-    ),
-
-    seconds: Math.floor(
-      (difference / 1000) % 60
-    ),
+    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((difference / (1000 * 60)) % 60),
+    seconds: Math.floor((difference / 1000) % 60),
   };
+}
+
+let currentTime = 0;
+const listeners = new Set<() => void>();
+let timer: ReturnType<typeof setInterval> | undefined;
+
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+
+  if (!timer) {
+    currentTime = Date.now();
+    callback();
+
+    timer = setInterval(() => {
+      currentTime = Date.now();
+      listeners.forEach((listener) => listener());
+    }, 1000);
+  }
+
+  return () => {
+    listeners.delete(callback);
+
+    if (listeners.size === 0 && timer) {
+      clearInterval(timer);
+      timer = undefined;
+    }
+  };
+}
+
+function getCurrentTime() {
+  return currentTime;
+}
+
+function getServerTime() {
+  return 0;
 }
 
 export default function ElectionCountdown({
   endDate,
 }: ElectionCountdownProps) {
-  /*
-   * Important:
-   * Start with a fixed value so the server and
-   * client render exactly the same HTML.
-   */
-  const [timeLeft, setTimeLeft] =
-    useState<TimeLeft>(EMPTY_TIME);
+  const now = useSyncExternalStore(
+    subscribe,
+    getCurrentTime,
+    getServerTime,
+  );
 
-  const [mounted, setMounted] =
-    useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-
-    // Calculate immediately after mounting.
-    setTimeLeft(
-      calculateTimeLeft(endDate)
-    );
-
-    const timer = setInterval(() => {
-      setTimeLeft(
-        calculateTimeLeft(endDate)
-      );
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [endDate]);
+  const timeLeft = calculateTimeLeft(endDate, now);
 
   const cardClass =
     "rounded-3xl border border-slate-800 bg-slate-900/70 p-6 text-center backdrop-blur";
@@ -94,9 +87,7 @@ export default function ElectionCountdown({
   return (
     <section className="space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-white">
-          Voting Ends In
-        </h2>
+        <h2 className="text-3xl font-bold text-white">Voting Ends In</h2>
 
         <p className="mt-2 text-slate-400">
           Cast your vote before the election closes.
@@ -106,50 +97,30 @@ export default function ElectionCountdown({
       <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
         <div className={cardClass}>
           <p className="text-5xl font-black text-cyan-400">
-            {mounted
-              ? timeLeft.days
-              : 0}
+            {timeLeft.days}
           </p>
-
-          <p className="mt-3 text-slate-400">
-            Days
-          </p>
+          <p className="mt-3 text-slate-400">Days</p>
         </div>
 
         <div className={cardClass}>
           <p className="text-5xl font-black text-cyan-400">
-            {mounted
-              ? timeLeft.hours
-              : 0}
+            {timeLeft.hours}
           </p>
-
-          <p className="mt-3 text-slate-400">
-            Hours
-          </p>
+          <p className="mt-3 text-slate-400">Hours</p>
         </div>
 
         <div className={cardClass}>
           <p className="text-5xl font-black text-cyan-400">
-            {mounted
-              ? timeLeft.minutes
-              : 0}
+            {timeLeft.minutes}
           </p>
-
-          <p className="mt-3 text-slate-400">
-            Minutes
-          </p>
+          <p className="mt-3 text-slate-400">Minutes</p>
         </div>
 
         <div className={cardClass}>
           <p className="text-5xl font-black text-cyan-400">
-            {mounted
-              ? timeLeft.seconds
-              : 0}
+            {timeLeft.seconds}
           </p>
-
-          <p className="mt-3 text-slate-400">
-            Seconds
-          </p>
+          <p className="mt-3 text-slate-400">Seconds</p>
         </div>
       </div>
     </section>

@@ -45,8 +45,5 @@ export async function createCategory(data: {
     .from("election_categories")
     .insert(data);
 
-  if (error) {
-  console.log("GET CATEGORIES ERROR:", error);
-  throw error;
-}
+  if (error) throw error;
 }

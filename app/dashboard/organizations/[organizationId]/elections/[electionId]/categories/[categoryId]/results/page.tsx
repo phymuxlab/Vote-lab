@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Handshake, Medal, Trophy, UserRound } from "lucide-react";
 
 import { getCategory } from "@/lib/categories";
 import { getCategoryResults } from "@/lib/votes";
@@ -79,7 +80,7 @@ export default async function ResultsPage({
                   />
                 ) : (
                   <div className="flex h-[70px] w-[70px] items-center justify-center rounded-full bg-slate-800 text-3xl">
-                    👤
+                    <UserRound className="h-8 w-8 text-cyan-400" aria-hidden="true" />
                   </div>
                 )}
 
@@ -87,19 +88,19 @@ export default async function ResultsPage({
                   <div className="mb-2 flex items-center gap-2">
                     {index === 0 && (
                       <span className="rounded-full bg-yellow-500 px-3 py-1 text-xs font-bold text-black">
-                        {isTie ? "🤝 Tie" : "🏆 Winner"}
+                        <>{isTie ? <Handshake className="mr-1 inline h-3.5 w-3.5" /> : <Trophy className="mr-1 inline h-3.5 w-3.5" />} {isTie ? "Tie" : "Winner"}</>
                       </span>
                     )}
 
                     {index === 1 && (
                       <span className="rounded-full bg-slate-300 px-3 py-1 text-xs font-bold text-black">
-                        🥈 2nd
+                        <><Medal className="mr-1 inline h-3.5 w-3.5" /> 2nd</>
                       </span>
                     )}
 
                     {index === 2 && (
                       <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-bold text-white">
-                        🥉 3rd
+                        <><Medal className="mr-1 inline h-3.5 w-3.5" /> 3rd</>
                       </span>
                     )}
                   </div>

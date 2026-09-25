@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
+import { BarChart3, Plus, UserRound } from "lucide-react";
 
 import { getCategory } from "@/lib/categories";
 import { getNomineesWithVotes } from "@/lib/nominees";
@@ -49,7 +50,7 @@ export default async function CategoryPage({
               variant="outline"
               className="border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-black"
             >
-              📊 View Results
+              <><BarChart3 className="mr-2 h-4 w-4" /> View Results</>
             </Button>
           </Link>
 
@@ -57,7 +58,7 @@ export default async function CategoryPage({
             href={`/dashboard/organizations/${organizationId}/elections/${electionId}/categories/${categoryId}/create`}
           >
             <Button className="bg-cyan-500 text-black hover:bg-cyan-400">
-              + Add Nominee
+              <><Plus className="mr-2 h-4 w-4" /> Add Nominee</>
             </Button>
           </Link>
         </div>
@@ -92,7 +93,7 @@ export default async function CategoryPage({
                 </div>
               ) : (
                 <div className="mb-4 flex h-28 w-28 items-center justify-center rounded-full bg-slate-800 text-4xl text-cyan-400 mx-auto">
-                  👤
+                  <UserRound className="h-10 w-10 text-cyan-400" aria-hidden="true" />
                 </div>
               )}
 

@@ -9,19 +9,26 @@ import SaveSettingsButton from "./SaveSettingsButton";
 
 import { updateElectionSettings } from "@/app/actions/election-settings/update";
 
+interface ElectionSettings {
+  voting_mode?: "public" | "secure_registration" | null;
+}
+
 interface ElectionSettingsFormProps {
   organizationId: string;
   electionId: string;
-  settings: any;
+  settings: ElectionSettings | null;
 }
 
 export default function ElectionSettingsForm({
   organizationId,
   electionId,
+  settings,
 }: ElectionSettingsFormProps) {
- const [mode, setMode] = useState(
-  settings?.voting_mode ?? "public"
-);
+  const [mode, setMode] = useState<"public" | "secure_registration">(
+    settings?.voting_mode === "secure_registration"
+      ? "secure_registration"
+      : "public",
+  );
 
   return (
     <form
